@@ -8,9 +8,22 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ProjectsModule } from './projects/projects.module';
 import { TasksModule } from './tasks/tasks.module';
 import { StorageModule } from './storage/storage.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [AuthModule, GuardsModule, UsersModule, PrismaModule, ProjectsModule, TasksModule, StorageModule],
+  imports: [
+    ConfigModule.forRoot({ 
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    AuthModule,
+    GuardsModule,
+    UsersModule,
+    PrismaModule,
+    ProjectsModule,
+    TasksModule,
+    StorageModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

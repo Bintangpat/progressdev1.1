@@ -1,14 +1,15 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class StorageService {
   private supabase: SupabaseClient;
 
-  constructor() {
+  constructor(private configService: ConfigService) {
     this.supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+      this.configService.get<string>('NEXT_PUBLIC_SUPABASE_URL') || '',
+      this.configService.get<string>('NEXT_PUBLIC_SUPABASE_ANON_KEY') || ''
     );
   }
 
