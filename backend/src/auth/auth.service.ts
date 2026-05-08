@@ -48,6 +48,7 @@ export class AuthService {
       email: registerDto.email,
       password: hashedPassword,
       displayName: registerDto.name,
+      role: 'stakeholder', // Ubah role default menjadi stakeholder
     });
 
     const payload = { email: user.email, sub: user.id, role: user.role };
@@ -59,6 +60,29 @@ export class AuthService {
         displayName: user.displayName,
         role: user.role,
       }
+    };
+  }
+
+  async socialLogin(data: { email: string; name: string; image?: string }) {
+    let user = await this.usersService.findByEmail(data.email);
+
+    if (!user) {
+      user = await this.usersService.create({
+        email: data.email,
+        displayName: data.name,
+        role: 'stakeholder', // Default role untuk social login juga stakeholder
+      });
+    }
+
+    const payload = { email: user.email, sub: user.id, role: user.role };
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName,
+        role: user.role,
+      },
     };
   }
 }

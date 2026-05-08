@@ -27,14 +27,10 @@ export class AuthController {
     return this.authService.register(registerDto);
   }
 
-  @Get('google')
-  @UseGuards(AuthGuard('google'))
-  async googleAuth() {}
-
-  @Get('callback/google')
-  @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req) {
-    // TODO: Issue JWT for Google user and redirect to frontend
-    return { message: "Google auth success", user: req.user };
+  @Post('social-login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login or register via social provider' })
+  async socialLogin(@Body() data: { email: string; name: string; image?: string }) {
+    return this.authService.socialLogin(data);
   }
 }

@@ -3,6 +3,7 @@ import { Inter, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AppSessionProvider } from "@/components/providers/session-provider";
 import "./globals.css";
 
 const inter = Inter({
@@ -37,8 +38,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <TooltipProvider>{children}</TooltipProvider>
-          <Toaster richColors position="top-right" />
+          <AppSessionProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+            <Toaster richColors position="top-right" />
+          </AppSessionProvider>
         </ThemeProvider>
       </body>
     </html>
