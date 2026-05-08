@@ -237,7 +237,7 @@ export default function RegisterPage() {
                 className="relative flex items-center py-4"
               >
                 <div className="grow border-t border-[#3f3f5f]"></div>
-                <span className="flex-shrink mx-4 text-xs text-[#888eb0]">
+                <span className="shrink mx-4 text-xs text-[#888eb0]">
                   Or register with
                 </span>
                 <div className="grow border-t border-[#3f3f5f]"></div>

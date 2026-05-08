@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DevProgress Kanban Board</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              primary: '#1E293B',
+              surface: '#f8f9ff',
+              dim: '#cbdbf5',
+              container: '#ffffff',
+            }
+          },
+          borderRadius: {
+            'card': '8px',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-layout">
+    body {
+      background-color: #f8f9ff;
+      font-family: 'Inter', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbdbf5;
+      border-radius: 10px;
+    }
+    .sidebar-icon-active {
+      background-color: #f1f5f9;
+      color: #1e293b;
+    }
+  </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+<!-- BEGIN: Left Sidebar -->
+<aside class="w-16 flex flex-col items-center py-4 bg-white border-r border-slate-200" data-purpose="main-navigation">
+<div class="mb-8" data-purpose="logo">
+<div class="w-10 h-10 bg-brand-primary rounded-lg flex items-center justify-center text-white font-bold">DP</div>
+</div>
+<nav class="flex-1 flex flex-col space-y-4 items-center">
+<a class="p-2 rounded-lg sidebar-icon-active text-slate-600 hover:text-brand-primary transition-colors" href="#">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+<a class="p-2 rounded-lg text-slate-400 hover:text-brand-primary transition-colors" href="#">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+<a class="p-2 rounded-lg text-slate-400 hover:text-brand-primary transition-colors" href="#">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+<a class="p-2 rounded-lg text-slate-400 hover:text-brand-primary transition-colors" href="#">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+</nav>
+<div class="mt-auto flex flex-col items-center space-y-4 pb-4">
+<button class="p-2 bg-slate-100 rounded-full text-slate-600 hover:bg-slate-200" title="Create Project">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<img alt="Profile" class="w-10 h-10 rounded-full border border-slate-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtelXNmYUCgmunxHacqO7ch_DlUeq3aImD-h8wLHMn6wjVrYCBP-P_JDeLoYcKX14869pPrRFCP4j4SQMZlmMlV_qqgHqBCvgl3RS0K4MyoZPou0aj8Xscm0EApTJibNPmHl2iQvFYQXMCPdiAzT90R3avFZrpa9XP49p4M926FO0dgH2ervDKoxXkP1Jm1-_45EOMdClFknnuX2cJZ1ZE9TdflwiJi-l48fr1yzMZyQrD6PNnF2orBX43aR-PY_ixMRCjh9h7V21F"/>
+</div>
+</aside>
+<!-- END: Left Sidebar -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 flex flex-col h-screen bg-slate-50 overflow-hidden">
+<!-- BEGIN: Top Header -->
+<header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0" data-purpose="header">
+<div class="flex items-center space-x-4 w-1/3">
+<div class="relative w-full max-w-sm">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3">
+<svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary" placeholder="Search..." type="text"/>
+<span class="absolute inset-y-0 right-0 flex items-center pr-3">
+<kbd class="px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 bg-slate-100 border border-slate-200 rounded">⌘ K</kbd>
+</span>
+</div>
+</div>
+<div class="flex items-center space-x-6">
+<a class="text-sm font-medium text-brand-primary" href="#">Get Pro</a>
+<button class="relative text-slate-400 hover:text-brand-primary">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+</button>
+<div class="flex items-center space-x-2 text-slate-400">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</header>
+<!-- END: Top Header -->
+<!-- BEGIN: Dashboard Controls -->
+<div class="px-8 pt-8 pb-4 flex flex-col md:flex-row md:items-center justify-between shrink-0" data-purpose="dashboard-toolbar">
+<div>
+<h1 class="text-2xl font-bold text-slate-800">Kanban Board</h1>
+<div class="mt-4 flex items-center space-x-1 p-1 bg-white border border-slate-200 rounded-lg w-fit">
+<button class="px-4 py-1.5 text-sm font-medium bg-slate-100 rounded-md text-slate-800">Board</button>
+<button class="px-4 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-800">List</button>
+<button class="px-4 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-800">Table</button>
+</div>
+</div>
+<div class="mt-4 md:mt-0 flex items-center space-x-4">
+<div class="flex -space-x-2">
+<img alt="Assignee" class="w-8 h-8 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHSRNfddgz2VEr-Uey_4HcIuKqVa2Y-r52JFC3UhiIMaPDkdR44kZOjYiLagzANyduPM8lDvXG0FEV5_LDXsPXSd1BkUVUYuFUsZVDgCKikSTchlhfU8syyxPCj2tWGEXocHy3TzM72cAP0yM7-s2txW0K9pJKLbwyny-XvxE4kY5S_Sz31KLuqOv0w8ptxYgL7xEsR5d1FkYZhrtANdrehMBv_OHA8m_Uc35aJlrm2Kx74tIGUMXj7FoSnBdwv79XUwjD0Vilk70j"/>
+<img alt="Assignee" class="w-8 h-8 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzSElXcNqJCS6fANf0zQWtbI6kOi5s6B2eA-CH72lGAt3Vppl2qtpTndx-n0pE8Ss-9XuAWIc0gev2ArhKOla5a_xcZ1Me-1pZCar5bqY4j1LkU-nyLdFNtfAD_l_NeMTMkRKE51sdRIYiMQlTnaL_4yh4lo8RFtbqGvhq15ye5rOfoiEtnqr6hDj10_G604W48e191kJu7QKr7sFYAXn5ZPUGEqYQHibZi5nZu6SMKRDk6pIvystqX3hX_hv21pLg479sbPgKTagg"/>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-600">AT</div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-slate-50 flex items-center justify-center text-[10px] font-medium text-slate-400">+5</div>
+</div>
+<button class="flex items-center px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Add Assignee
+        </button>
+<button class="flex items-center px-4 py-2 bg-brand-primary rounded-lg text-sm font-medium text-white hover:bg-slate-800">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Add Board
+        </button>
+</div>
+</div>
+<div class="px-8 pb-4 flex items-center justify-between shrink-0">
+<div class="relative w-64">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3">
+<svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="block w-full pl-9 pr-3 py-1.5 border border-slate-200 rounded-lg text-sm bg-white" placeholder="Search tasks..." type="text"/>
+</div>
+<button class="flex items-center px-4 py-1.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 bg-white">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        Filters
+      </button>
+</div>
+<!-- END: Dashboard Controls -->
+<!-- BEGIN: Kanban Board Container -->
+<div class="flex-1 overflow-x-auto p-8 pt-0 custom-scrollbar" data-purpose="kanban-scroll-area">
+<div class="flex space-x-6 min-h-full">
+<!-- Column: Direncanakan (Backlog) -->
+<section class="flex-shrink-0 w-80" data-purpose="column-direncanakan">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<h3 class="font-semibold text-slate-800">Direncanakan</h3>
+<span class="px-2 py-0.5 bg-slate-200 text-slate-600 rounded text-xs font-bold">4</span>
+</div>
+<div class="flex items-center space-x-2 text-slate-400">
+<button><svg class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></button>
+<button><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</div>
+<div class="space-y-4">
+<!-- Task Card 1 -->
+<div class="bg-white p-5 rounded-card border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+<h4 class="font-bold text-slate-800 mb-2 leading-tight">Integrate Stripe payment gateway</h4>
+<p class="text-xs text-slate-500 mb-6 line-clamp-2">Compile competitor landing page designs for inspiration. G..</p>
+<div class="flex items-center justify-between mb-4">
+<div class="flex -space-x-1.5">
+<img alt="U1" class="w-7 h-7 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBsgz75aY16MHOuIuJ0UBvSNzrMw8R7yVd9JwyA4VzJFY395466Z782RMVPlGaXOXJqxge2sRY0Rvo1ulvu_69sRcIU8BeFHSvJvjtoo0w9Z4XAqYH_bgpzlxyoOg0zajw_KibEzb5-UlNR7XPeEBCzIX3-0oqgr1D68ISNPleL8m3iqI0i-d_VzSCMGs1JzccaimtRA9QjxXF_eb_1U7DbqCKI0lur3UI5g4mNBo49oavAvmTfAnOC3b6U2M28XozkDafTKGYA9E7"/>
+<img alt="U2" class="w-7 h-7 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3xqGnzgIlg-FEQqjLOWmNLCopqeDQAcq5NpuC8Pzq-sOWHcmf_onBdg3Kc7YzACHBopy9wa5YWX9NjasdOyX7q18DxZa5_DP0p9ffoVn9Agf1ze0gMt3HyqZ9huxXc0HhobUuxZXB0dqDm-ZkQPnlzBj3MjJWeU9CAL2b1CWoKqq9H67GMEqbT8-ZZyYOZD6Jb0jDCJTEd5tiQsbHJHgAhAHgMfQ5Op5hZJ4OlBNaqjakt-yos30dLWd-lfwrum1jAKb87pdhWPEB"/>
+</div>
+<div class="flex items-center space-x-1 text-slate-400 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">
+<div class="w-3 h-3 rounded-full border-2 border-slate-300 border-t-brand-primary animate-spin"></div>
+<span class="text-[10px] font-bold">10%</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-100">
+<span class="px-3 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold">High</span>
+<div class="flex items-center space-x-3 text-slate-400">
+<span class="flex items-center text-[10px] font-medium"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> 2</span>
+<span class="flex items-center text-[10px] font-medium"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> 4</span>
+</div>
+</div>
+</div>
+<!-- Task Card 2 -->
+<div class="bg-white p-5 rounded-card border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+<h4 class="font-bold text-slate-800 mb-2 leading-tight">Redesign marketing homepage</h4>
+<p class="text-xs text-slate-500 mb-6 line-clamp-2">Compile competitor landing page designs for inspiration. G..</p>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<span class="text-[10px] font-bold text-slate-400">LB</span>
+<img alt="U1" class="w-7 h-7 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoIQY1uHWewmw0e5EDhjJ8qy3dhxM58fKrBZlhaBoyv__VEU6_qyS3VABI-Sle9cwYu7FajjpNlJ3z87-zWcNC1BQHBgBroJSdaexCik1vXtkNfLWE5i18AmnS42DJJIYNhXwJ_ZfAHcxCK0JsMsHn_adKGF-74KiWlzr2lCg20CgfbrkXvqmvjYp4ytl7xHl5jjCKzvXpJJr-cEcdUJunZ4-N-piErcYJ7wo_1f4UNDPDrviEzrIcZD2oIrqJF3BDY0BzH5HCmh_0"/>
+</div>
+<div class="flex items-center space-x-1 text-slate-400 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">
+<div class="w-3 h-3 rounded-full border-2 border-slate-200"></div>
+<span class="text-[10px] font-bold">0%</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-100">
+<span class="px-3 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold">Medium</span>
+<div class="flex items-center space-x-3 text-slate-400">
+<span class="flex items-center text-[10px] font-medium"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> 1</span>
+<span class="flex items-center text-[10px] font-medium"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> 1</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Column: Dikerjakan (In Progress) -->
+<section class="flex-shrink-0 w-80" data-purpose="column-dikerjakan">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<h3 class="font-semibold text-slate-800">Dikerjakan</h3>
+<span class="px-2 py-0.5 bg-slate-200 text-slate-600 rounded text-xs font-bold">3</span>
+</div>
+<div class="flex items-center space-x-2 text-slate-400">
+<button><svg class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></button>
+<button><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</div>
+<div class="space-y-4">
+<!-- Task Card 3 -->
+<div class="bg-white p-5 rounded-card border border-slate-200 shadow-sm">
+<h4 class="font-bold text-slate-800 mb-2 leading-tight">Dark mode toggle implementation</h4>
+<p class="text-xs text-slate-500 mb-6 line-clamp-2">Compile competitor landing page designs for inspiration. G..</p>
+<div class="flex items-center justify-between mb-4">
+<div class="flex -space-x-1.5">
+<img alt="U1" class="w-7 h-7 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPhWsRCwqEvPFaXb5VPPE9UNZ0-IP2k8TUo8H3O2hGlzSbzhoD8e4enRthzYuf9c0WgZYtRqOQgY7pXMPo2w90EG3hKETOug6qUs4mNxXT1wC9urdJkI6NOH0ecRChJ5SVMHPFza4Wt0auypTD1sJy65qCQNmSmCHS0XakoxxtycdbOuoxU-vw0U_mtRd_BS11EpJ8YX6xnCaTg1cY5cqF5dULf1SS61f58a3Hkdmv90L42ZoHcLtz4waLc428Zfm6poN6c64w9r6x"/>
+<img alt="U2" class="w-7 h-7 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCu92EK4plfb9xW9G721fIlDbHbIecmR9RRmCT89nOC6wNZ-CiS1EAREGQV5vDXl2oEt212ipfFBQW-us4axSNCWQNutcZ1_eGXhXFuSyB_kAOYVg0AErH14G7tbV0es3QpyBwzFJmq9UNjRFARgEHXhqt19YkVw69W8cBjoFxsJi6cZnmbKgGmNBtm7-3X9JbX34GgN54rfG6SLLQU-eD8ZH7uKwJflWWyTVBIfvuDJk94PaBQGK170WXk_Gw7DPdII6-u6zgxgnlo"/>
+</div>
+<div class="flex items-center space-x-1 text-slate-400 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">
+<div class="w-3 h-3 rounded-full border-2 border-slate-300 border-l-brand-primary animate-spin"></div>
+<span class="text-[10px] font-bold">40%</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-100">
+<span class="px-3 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold">High</span>
+<div class="flex items-center space-x-3 text-slate-400">
+<span class="flex items-center text-[10px] font-medium"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> 2</span>
+<span class="flex items-center text-[10px] font-medium"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> 6</span>
+</div>
+</div>
+</div>
+<!-- Task Card 4 -->
+<div class="bg-white p-5 rounded-card border border-slate-200 shadow-sm">
+<h4 class="font-bold text-slate-800 mb-2 leading-tight">Database schema refactoring</h4>
+<p class="text-xs text-slate-500 mb-6 line-clamp-2">Compile competitor landing page designs for inspiration. G..</p>
+<div class="flex items-center justify-between mb-4">
+<div class="flex -space-x-1.5">
+<img alt="U1" class="w-7 h-7 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCS5EsksQ7jNndCN_ZmRVMQkGnPcuri_kL07jjK8PDFYtfG9i4xSwAymE4K2p-WayjsSob6EFvAwHBGof-vhbHUwXAUa-6W6aSC_mA1u3EbjsKGdrz0kC2rgHWX6FxtAsrYeunifRGRrsr4timz2MMrjPhdtqduQvg9wRJvPNXCQk6lelZvzfGYKbd1xaZhfpY4NOER2S_DW-F4pkA55ObKw4Y1SDesHW0QtfChx7oZf7vVdIxO-ogrkrRuXbXCuiFoR9Cjbwr1Az6O"/>
+<img alt="U2" class="w-7 h-7 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxYkp4QES5LZ6rRB7gdWTi70GP1kb2GfrejfQdbYoVQzeJ95ZqkIAkE9Wfhs9U_YLzg7UR-IVBuMyyYum1zauA8zcWnxQaPfXjmbNk-XuM09ACULJjZ8vA_8ISkERRm2TsOay8a_FnEve2JOPmIcCPsM6f2VcVQQfg2rmhO4_ISKw_1WEg-UPSj-9Qm-RzUoregRozeoOxEnMFiBDFb5IC90hvAUtScco6Bmh9-XCDu0MsR5pAihw0KOkwtvKhzSrm97xeLw9nshKP"/>
+</div>
+<div class="flex items-center space-x-1 text-slate-400 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">
+<div class="w-3 h-3 rounded-full border-2 border-orange-200 border-t-orange-500"></div>
+<span class="text-[10px] font-bold text-orange-600">55%</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-100">
+<span class="px-3 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold">Medium</span>
+<div class="flex items-center space-x-3 text-slate-400">
+<span class="flex items-center text-[10px] font-medium"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> 3</span>
+<span class="flex items-center text-[10px] font-medium"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> 2</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Column: Sedang di Review -->
+<section class="flex-shrink-0 w-80" data-purpose="column-review">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<h3 class="font-semibold text-slate-800">Sedang di Review</h3>
+<span class="px-2 py-0.5 bg-slate-200 text-slate-600 rounded text-xs font-bold">0</span>
+</div>
+<div class="flex items-center space-x-2 text-slate-400">
+<button><svg class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></button>
+<button><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</div>
+<div class="h-32 border-2 border-dashed border-slate-200 rounded-card flex items-center justify-center">
+<span class="text-xs text-slate-400">No tasks in review</span>
+</div>
+</section>
+<!-- Column: Sedang di Uji -->
+<section class="flex-shrink-0 w-80" data-purpose="column-testing">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<h3 class="font-semibold text-slate-800">Sedang di Uji</h3>
+<span class="px-2 py-0.5 bg-slate-200 text-slate-600 rounded text-xs font-bold">0</span>
+</div>
+<div class="flex items-center space-x-2 text-slate-400">
+<button><svg class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></button>
+<button><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</div>
+<div class="h-32 border-2 border-dashed border-slate-200 rounded-card flex items-center justify-center">
+<span class="text-xs text-slate-400">No tasks being tested</span>
+</div>
+</section>
+<!-- Column: Selesai (Done) -->
+<section class="flex-shrink-0 w-80" data-purpose="column-selesai">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center space-x-2">
+<h3 class="font-semibold text-slate-800">Selesai</h3>
+<span class="px-2 py-0.5 bg-slate-200 text-slate-600 rounded text-xs font-bold">2</span>
+</div>
+<div class="flex items-center space-x-2 text-slate-400">
+<button><svg class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></button>
+<button><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</div>
+<div class="space-y-4">
+<!-- Task Card 5 -->
+<div class="bg-white p-5 rounded-card border border-slate-200 shadow-sm opacity-75">
+<h4 class="font-bold text-slate-800 mb-2 leading-tight line-through decoration-slate-400">Set up CI/CD pipeline</h4>
+<p class="text-xs text-slate-500 mb-6 line-clamp-2">Compile competitor landing page designs for inspiration. G..</p>
+<div class="flex items-center justify-between mb-4">
+<div class="flex -space-x-1.5">
+<img alt="U1" class="w-7 h-7 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLCOSJaDeUiluMDwK0oJDRmHVA-cIVdQXQIjP1HMZeGmL7bNu7u7G-_c96pEUPwR9j4Fg4i364dWYSBr09cPtNbLb_txSDRZqaHndz8vcfK6snFuxKeo6LUzp7Y7-Go3r5DDpfUPawGXwIU00_s21ZM3BbfOi3Qsx9Tc-Ir0grdJjkGpKtc7svoHgUJ3fL_SGdAs1k4hojGp0b4qWE8ImKXx24Aklfc3OXBBwO0atuKRn9oH3N2bRUJULTFR-omU9g_M0EPrTFe4KC"/>
+<img alt="U2" class="w-7 h-7 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7PKGyzthZJLt4khuVfQD-I7bun2rauKaAi5Kr3vRTyX7cQ5ZiqQCA7Klv5DBl43INGtEDiTm6LZPh_3Pja-CZsHnuuWcjtawret_G1AgAPu1dCwY18T5RM2yJOMII35p502kQiwzes5T-2t59byVKIh_GXrD0XL5riTeTeaeY8XTzbLYlrp_JQ_6hSugNCnfFGwem1cop5Ziqgt1EdfEkeFv4UIY7iVizCmxtEherCzUlpLDDUk9oSkNmAwbXxIQb9OWc1_ATlURB"/>
+</div>
+<div class="flex items-center space-x-1 text-green-600 bg-green-50 px-2 py-1 rounded-full border border-green-100">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg>
+<span class="text-[10px] font-bold">100%</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-100">
+<span class="px-3 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold">High</span>
+<div class="flex items-center space-x-3 text-slate-400">
+<span class="flex items-center text-[10px] font-medium"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> 2</span>
+<span class="flex items-center text-[10px] font-medium"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> 4</span>
+</div>
+</div>
+</div>
+<!-- Task Card 6 -->
+<div class="bg-white p-5 rounded-card border border-slate-200 shadow-sm opacity-75">
+<h4 class="font-bold text-slate-800 mb-2 leading-tight line-through decoration-slate-400">Initial project setup</h4>
+<p class="text-xs text-slate-500 mb-6 line-clamp-2">Compile competitor landing page designs for inspiration. G..</p>
+<div class="flex items-center justify-between mb-4">
+<div class="flex -space-x-1.5">
+<img alt="U1" class="w-7 h-7 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrlpsBETtnnJLaPUZO3tUHDGMH8YMOHTlh_X7wLZzeXVPnGjOg2LoWBu2WXt91V0th5UfM3Rfb3-U_x3CpvgN3hzNK-dRZTppkCOrBZRBz1YP9vOuNaQuLKCe2WWxeqppa3XZKltuW8tznwx06UWPwdvuKcOIWAiJCbrroRB9EMeSGIWGtzuzt6zawGb_dg63DxT15ACl9iqjOEH5m2D3Ec97T_IljX5UH_4At8RfxBacwLRQUmn-WidWS4UFOg0oSpQ2s9LwSxUVC"/>
+<img alt="U2" class="w-7 h-7 rounded-full border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7TuV6YRxH8hU0haFsp7GOmiMxoVy6ig8pkJlaOqDtxRnyKPVWXK4fxkKDj8Svua8HBMwkcOiqVk4MhHAL-w3L15MCUpHww5XrlWxAx2slUHjG-tzQVmPeeglWg-s3S_6IBO79LvwfBpu4_UG7b3Eh4aovi8liroVKHp3LwRkWIPCd1N1kZODIxqZWpZUbbkKhteonUtM1TWWm-u7-wLVv1xOHjwg0Pi6We9QoguhDOS6UBtBaNECeV4mlv62dYes3y7hb6-0ubGVN"/>
+</div>
+<div class="flex items-center space-x-1 text-green-600 bg-green-50 px-2 py-1 rounded-full border border-green-100">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg>
+<span class="text-[10px] font-bold">100%</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-100">
+<span class="px-3 py-1 bg-slate-100 text-slate-600 rounded text-[10px] font-bold">Medium</span>
+<div class="flex items-center space-x-3 text-slate-400">
+<span class="flex items-center text-[10px] font-medium"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> 1</span>
+<span class="flex items-center text-[10px] font-medium"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> 2</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- END: Kanban Board Container -->
+</main>
+<!-- END: Main Content Area -->
+</body></html>

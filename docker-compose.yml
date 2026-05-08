@@ -1,0 +1,56 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dev-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: devprogress
+    ports:
+      - "5433:5432" # Dipetakan ke 5433 karena port 5432 di host Anda sedang digunakan
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - progressdev-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dev-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/devprogress?schema=public
+      - JWT_SECRET=super_secret
+      - PORT=3001
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CLIENT_URI=${GOOGLE_CLIENT_URI}
+    depends_on:
+      - db
+    networks:
+      - progressdev-network
+
+  frontend:
+    build:
+      context: ./ProgressDev
+      dockerfile: Dockerfile
+    container_name: dev-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=some_secret
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    depends_on:
+      - backend
+    networks:
+      - progressdev-network
+
+networks:
+  progressdev-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
