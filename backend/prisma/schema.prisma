@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  admin
+  developer
+  stakeholder
+}
+
+enum ProjectStatus {
+  draft
+  active
+  completed
+}
+
+enum TaskStatus {
+  direncanakan
+  dalam_pengerjaan
+  sedang_direview
+  pengujian
+  selesai
+}
+
+model Profile {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  password     String?   // Ditambahkan untuk traditional auth (Bcrypt)
+  displayName  String?   @map("display_name")
+  whatsapp     String?
+  role         Role      @default(developer)
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  projects     Project[]
+
+  @@map("profiles")
+}
+
+model Project {
+  id                String         @id @default(uuid()) @db.Uuid
+  userId            String         @map("user_id") @db.Uuid
+  stakeholderName   String         @map("stakeholder_name")
+  platformName      String         @map("platform_name")
+  durationStart     DateTime       @map("duration_start") @db.Date
+  durationEnd       DateTime       @map("duration_end") @db.Date
+  publicSlug        String         @unique @default(dbgenerated("encode(gen_random_bytes(8), 'hex')")) @map("public_slug")
+  status            ProjectStatus  @default(draft)
+  developerWhatsapp String         @map("developer_whatsapp")
+  createdAt         DateTime       @default(now()) @map("created_at")
+
+  user              Profile        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks             Task[]
+  comments          Comment[]
+
+  @@map("projects")
+}
+
+model Task {
+  id           String       @id @default(uuid()) @db.Uuid
+  projectId    String       @map("project_id") @db.Uuid
+  title        String
+  description  String?
+  isCompleted  Boolean      @default(false) @map("is_completed")
+  status       TaskStatus   @default(direncanakan)
+  orderIndex   Int          @default(0) @map("order_index")
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  checklists   ChecklistItem[]
+  screenshots  TaskScreenshot[]
+
+  @@map("tasks")
+}
+
+model ChecklistItem {
+  id        String   @id @default(uuid()) @db.Uuid
+  taskId    String   @map("task_id") @db.Uuid
+  label     String
+  isChecked Boolean  @default(false) @map("is_checked")
+
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@map("checklist_items")
+}
+
+model TaskScreenshot {
+  id        String   @id @default(uuid()) @db.Uuid
+  taskId    String   @map("task_id") @db.Uuid
+  imageUrl  String   @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@map("task_screenshots")
+}
+
+model Comment {
+  id          String   @id @default(uuid()) @db.Uuid
+  projectId   String   @map("project_id") @db.Uuid
+  parentId    String?  @map("parent_id") @db.Uuid
+  authorName  String   @map("author_name")
+  message     String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parent      Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies     Comment[] @relation("CommentReplies")
+
+  @@map("comments")
+}
