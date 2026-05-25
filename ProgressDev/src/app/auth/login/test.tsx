@@ -4,26 +4,14 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import {
-  Eye,
-  EyeOff,
-  ArrowRight,
-  Chrome,
-  Apple,
-  Loader2,
-  User,
-} from "lucide-react";
+import { Eye, EyeOff, ArrowRight, Chrome, Apple, Loader2 } from "lucide-react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -45,37 +33,24 @@ export default function RegisterPage() {
     visible: { opacity: 1, x: 0 },
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3001/auth/register", {
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: { "Content-Type": "application/json" },
+      const result = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success("Registrasi berhasil! Mengarahkan...");
-        // Auto sign in after registration
-        const result = await signIn("credentials", {
-          email: formData.email,
-          password: formData.password,
-          redirect: false,
-        });
-
-        if (result?.error) {
-          router.push("/auth/login");
-        } else {
-          const session = await getSession();
-          const role = (session?.user as any)?.role || "stakeholder";
-          router.push(`/${role}/dashboard`);
-        }
+      if (result?.error) {
+        toast.error("Email atau password salah");
       } else {
-        toast.error(data.message || "Gagal registrasi");
+        toast.success("Berhasil masuk");
+        const session = await getSession();
+        const role = (session?.user as any)?.role || "stakeholder";
+        router.push(`/${role}/dashboard`);
       }
     } catch (error) {
       toast.error("Terjadi kesalahan sistem");
@@ -85,7 +60,7 @@ export default function RegisterPage() {
   };
 
   const handleGoogleLogin = () => {
-    signIn("google", { callbackUrl: "/auth/redirect" });
+    signIn("google");
   };
 
   return (
@@ -100,7 +75,7 @@ export default function RegisterPage() {
         <section className="hidden md:flex md:w-1/2 relative bg-black overflow-hidden group">
           <Image
             alt="Technical Execution background"
-            src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070&auto=format&fit=crop"
+            src="https://lh3.googleusercontent.com/aida/ADBb0uhrskDOy6YkY0gF-dPdsUfUeSbPYKf2EUx98GsD4BCcFTt3kff4G4DvwhR1j8Z_dBBFbtyTKh_zLYM_svojv29TPSXBx4Jgtm6hGShBDQbmF71OsBtDIzCK1aANrwo_U3_ioauGLUPIwbBqM1l6D63sObNF8bM7OLG2M0IUFg36QkII0T1suceHKeSi_hCnUv0GoUCWfjGAkPTAnhkD1TQXw8Brafgrvzhdrel7Hi_FrmJZnTqgN1sIoQ49JYPi-gt0n7ZoKbcqphM"
             fill
             className="object-cover opacity-70 group-hover:scale-105 transition-transform duration-700"
             priority
@@ -125,22 +100,22 @@ export default function RegisterPage() {
                 transition={{ delay: 0.3 }}
                 className="text-4xl font-bold text-white leading-tight mb-4"
               >
-                Join the <br /> Future of Dev
+                Streamlining <br /> Technical Execution
               </motion.h1>
               <p className="text-white/60 text-sm">
-                Start monitoring your projects with transparency and speed.
+                Empowering developers to reach milestones faster.
               </p>
 
               <div className="flex gap-2 mt-8">
+                <span className="h-1 w-6 bg-white/20 rounded-full" />
+                <span className="h-1 w-6 bg-white/20 rounded-full" />
                 <span className="h-1 w-10 bg-white rounded-full" />
-                <span className="h-1 w-6 bg-white/20 rounded-full" />
-                <span className="h-1 w-6 bg-white/20 rounded-full" />
               </div>
             </div>
           </div>
         </section>
 
-        {/* Sisi Kanan: Form Register */}
+        {/* Sisi Kanan: Form Login */}
         <section className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center">
           <motion.div
             variants={containerVariants}
@@ -149,41 +124,19 @@ export default function RegisterPage() {
             className="w-full max-w-sm mx-auto md:mx-0"
           >
             <div className="mb-10 text-center md:text-left">
-              <h2 className="text-3xl font-bold text-white mb-2">
-                Create Account
-              </h2>
+              <h2 className="text-3xl font-bold text-white mb-2">Sign in</h2>
               <p className="text-[#888eb0] text-sm">
-                Already have an account?{" "}
+                New to DevProgress?{" "}
                 <Link
-                  href="/auth/login"
+                  href="/auth/register"
                   className="text-[#7c5dfa] hover:underline font-medium"
                 >
-                  Sign in
+                  Create an account
                 </Link>
               </p>
             </div>
 
-            <form onSubmit={handleRegister} className="space-y-5">
-              <motion.div variants={itemVariants}>
-                <label className="sr-only">Full Name</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    required
-                    placeholder="Full Name"
-                    className="w-full bg-[#2d2d44] border border-[#3f3f5f] rounded-xl p-4 pl-12 text-sm text-white placeholder-[#888eb0] focus:outline-none focus:ring-2 focus:ring-[#7c5dfa] focus:border-transparent transition-all"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                  />
-                  <User
-                    size={18}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888eb0]"
-                  />
-                </div>
-              </motion.div>
-
+            <form onSubmit={handleLogin} className="space-y-5">
               <motion.div variants={itemVariants}>
                 <label className="sr-only">Email</label>
                 <input
@@ -219,6 +172,25 @@ export default function RegisterPage() {
                 </button>
               </motion.div>
 
+              <motion.div
+                variants={itemVariants}
+                className="flex items-center justify-between text-xs"
+              >
+                <label className="flex items-center text-[#888eb0] cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    className="rounded bg-[#2d2d44] border-[#3f3f5f] text-[#7c5dfa] focus:ring-[#7c5dfa] mr-2 transition-colors"
+                  />
+                  Remember me
+                </label>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-[#7c5dfa] hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </motion.div>
+
               <motion.button
                 variants={itemVariants}
                 whileHover={{ scale: 1.01 }}
@@ -230,7 +202,7 @@ export default function RegisterPage() {
                 {isLoading ? (
                   <Loader2 className="animate-spin" size={20} />
                 ) : (
-                  "Create Account"
+                  "Sign In"
                 )}
               </motion.button>
 
@@ -240,7 +212,7 @@ export default function RegisterPage() {
               >
                 <div className="grow border-t border-[#3f3f5f]"></div>
                 <span className="shrink mx-4 text-xs text-[#888eb0]">
-                  Or register with
+                  Or login with
                 </span>
                 <div className="grow border-t border-[#3f3f5f]"></div>
               </motion.div>
@@ -272,6 +244,20 @@ export default function RegisterPage() {
                 </button>
               </motion.div>
             </form>
+
+            <motion.p
+              variants={itemVariants}
+              className="mt-10 text-center text-[11px] text-[#888eb0] leading-relaxed"
+            >
+              By clicking "Sign In", you agree to our <br />
+              <Link href="/terms" className="underline hover:text-white">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="underline hover:text-white">
+                Privacy Policy
+              </Link>
+            </motion.p>
           </motion.div>
         </section>
       </motion.main>

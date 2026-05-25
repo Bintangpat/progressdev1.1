@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowRight, Chrome, Apple, Loader2 } from "lucide-react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -48,7 +48,9 @@ export default function LoginPage() {
         toast.error("Email atau password salah");
       } else {
         toast.success("Berhasil masuk");
-        router.push("/stakeholder");
+        const session = await getSession();
+        const role = (session?.user as any)?.role || "stakeholder";
+        router.push(`/${role}/dashboard`);
       }
     } catch (error) {
       toast.error("Terjadi kesalahan sistem");
@@ -58,7 +60,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    signIn("google", { callbackUrl: "/stakeholder" });
+    signIn("google", { callbackUrl: "/auth/redirect" });
   };
 
   return (

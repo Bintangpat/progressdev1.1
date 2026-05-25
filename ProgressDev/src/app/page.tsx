@@ -11,6 +11,7 @@ import {
   Globe,
   Monitor,
 } from "lucide-react";
+import Link from "next/link";
 
 // --- Animation Variants ---
 const fadeIn = {
@@ -86,12 +87,11 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="flex items-center gap-6">
-            <button className="text-sm font-semibold text-slate-700 hover:text-blue-600">
-              Log In
-            </button>
-            <button className="px-6 py-2.5 bg-blue-600 text-white rounded-full text-sm font-bold hover:shadow-lg hover:shadow-blue-200 transition-all active:scale-95 flex items-center gap-2">
-              Get Started <ArrowRight size={16} />
-            </button>
+            <Link href="/auth/login">
+              <button className="px-6 py-2.5 bg-blue-600 text-white rounded-full text-sm font-bold hover:shadow-lg hover:shadow-blue-200 transition-all active:scale-95 flex items-center gap-2">
+                Get Started <ArrowRight size={16} />
+              </button>
+            </Link>
           </div>
         </div>
       </nav>

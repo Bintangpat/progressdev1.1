@@ -35,7 +35,7 @@ model Profile {
   password     String?   // Ditambahkan untuk traditional auth (Bcrypt)
   displayName  String?   @map("display_name")
   whatsapp     String?
-  role         Role      @default(developer)
+  role         Role      @default(stakeholder)
   createdAt    DateTime  @default(now()) @map("created_at")
 
   projects     Project[]

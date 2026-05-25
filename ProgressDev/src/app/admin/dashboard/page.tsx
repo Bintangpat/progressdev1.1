@@ -74,44 +74,8 @@ const PROJECTS = [
 export default function GlobalOverview() {
   return (
     <div className="flex min-h-screen bg-[#f8f9ff] text-[#0b1c30] font-sans">
-      {/* SideNavBar Component [cite: 4] */}
-      <aside className="fixed left-0 top-0 h-full w-[280px] bg-[#eff4ff] border-r border-[#c5c6cd] flex flex-col py-6 px-4 z-50">
-        <div className="flex items-center gap-3 px-2 mb-8">
-          <div className="w-10 h-10 rounded-lg bg-[#0058be] flex items-center justify-center text-white">
-            <Terminal size={24} />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-[#091426]">DevProgress</h2>
-            <p className="text-[12px] text-[#45474c] font-medium opacity-70">
-              Technical Execution
-            </p>
-          </div>
-        </div>
-
-        <button className="mb-6 mx-2 py-2.5 px-4 bg-[#0058be] text-white rounded-lg text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-md">
-          <Plus size={18} />
-          Create Project
-        </button>
-
-        <nav className="flex flex-col gap-1 grow">
-          <SidebarLink icon={<Users size={20} />} label="User Management" />
-          <SidebarLink
-            icon={<LayoutDashboard size={20} />}
-            label="Global Overview"
-            active
-          />
-          <SidebarLink icon={<Kanban size={20} />} label="Kanban Board" />
-          <SidebarLink icon={<Flag size={20} />} label="Stakeholder View" />
-        </nav>
-
-        <div className="mt-auto flex flex-col gap-1 pt-6 border-t border-[#c5c6cd]">
-          <SidebarLink icon={<Settings size={20} />} label="Settings" />
-          <SidebarLink icon={<LogOut size={20} />} label="Logout" />
-        </div>
-      </aside>
-
       {/* Main Content Area */}
-      <main className="ml-[280px] flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col">
         {/* TopAppBar Component [cite: 4] */}
         <header className="h-16 bg-white border-b border-[#c5c6cd] flex justify-between items-center px-8 sticky top-0 z-40">
           <div className="relative w-full max-w-xl">
