@@ -1,336 +1,537 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight,
-  Terminal,
-  ShieldCheck,
-  Activity,
+  Menu,
+  X,
   ArrowUpRight,
+  ArrowRight,
+  Star,
+  Paintbrush,
   Globe,
-  Monitor,
+  Code,
+  Smartphone,
+  Terminal,
 } from "lucide-react";
-import Link from "next/link";
 
-// --- Animation Variants ---
-const fadeIn = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6 },
-};
-
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1,
-    },
+// Data untuk Bento Core Features
+const FEATURES = [
+  {
+    icon: Star,
+    title: "Real-time Dashboard",
+    desc: "Visibilitas instan untuk status proyek, progres sprint, dan metrik kesehatan development.",
   },
-};
+  {
+    icon: Paintbrush,
+    title: "Milestone Tracking",
+    desc: "Pantau pencapaian besar dan pastikan pengerjaan fitur berjalan sesuai tenggat waktu.",
+  },
+  {
+    icon: Globe,
+    title: "Client Portal",
+    desc: "Akses khusus dan aman bagi stakeholder untuk melihat update tanpa mengganggu alur kerja developer.",
+  },
+  {
+    icon: Code,
+    title: "Task & Bug Management",
+    desc: "Kelola backlog, perbaikan bug, dan penugasan tim secara terstruktur.",
+  },
+  {
+    icon: Smartphone,
+    title: "Automated Reports",
+    desc: "Hasilkan ringkasan progres mingguan atau bulanan secara otomatis dengan satu klik.",
+  },
+  {
+    icon: Terminal,
+    title: "Feedback Loop",
+    desc: "Stakeholder dapat meninggalkan komentar atau revisi langsung pada task atau fitur tertentu.",
+  },
+];
 
-// --- Sub-Components ---
+// Data untuk Slanted Cards (How it works)
+const STEPS = [
+  {
+    id: "01",
+    title: "01 Inisiasi",
+    desc: "Tambahkan stakeholder, definisikan scope proyek, dan tetapkan milestone utama pengembangan.",
+    rotate: "hover:rotate-0 rotate-[3deg]",
+    align: "md:self-end md:mr-24",
+  },
+  {
+    id: "02",
+    title: "02 Tracking",
+    desc: "Tim developer memperbarui status task dan sprint secara progresif di dalam sistem.",
+    rotate: "hover:rotate-0 rotate-[-2deg]",
+    align: "md:self-start md:ml-12",
+  },
+  {
+    id: "03",
+    title: "03 Review",
+    desc: "Stakeholder dapat memantau timeline, melihat hasil kerja, dan memberikan feedback langsung.",
+    rotate: "hover:rotate-0 rotate-[4deg]",
+    align: "md:self-end md:mr-32",
+  },
+  {
+    id: "04",
+    title: "04 Delivery",
+    desc: "Aplikasi siap dirilis. Sistem menyediakan laporan otomatis dari awal hingga akhir siklus development.",
+    rotate: "hover:rotate-0 rotate-[-3deg]",
+    align: "md:self-start md:ml-24",
+  },
+];
 
-const MetricCard = ({ value, label }: { value: string; label: string }) => (
-  <motion.div variants={fadeIn} className="text-center text-white">
-    <h4 className="text-[32px] md:text-[40px] font-bold">{value}</h4>
-    <p className="text-blue-100/70 text-sm md:text-base font-medium">{label}</p>
-  </motion.div>
-);
+export default function ProgressDevLanding() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-const CapabilityItem = ({
-  icon: Icon,
-  title,
-  description,
-}: {
-  icon: any;
-  title: string;
-  description: string;
-}) => (
-  <motion.div variants={fadeIn} className="flex gap-6 group cursor-default">
-    <div className="shrink-0 w-14 h-14 rounded-full border border-slate-200 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 ease-out shadow-sm">
-      <Icon size={24} />
-    </div>
-    <div>
-      <h3 className="text-xl font-bold mb-2 text-slate-900">{title}</h3>
-      <p className="text-slate-600 text-sm leading-relaxed max-w-md">
-        {description}
-      </p>
-      <button className="inline-flex items-center gap-1 text-blue-600 font-semibold text-sm mt-4 hover:gap-2 transition-all">
-        Learn more <ArrowRight size={14} />
-      </button>
-    </div>
-  </motion.div>
-);
+  // Varian animasi global untuk Scroll Reveal
+  const fadeInUpVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
+  };
 
-export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white text-slate-900 selection:bg-blue-100 selection:text-blue-700">
-      {/* Top Navigation */}
-      <nav className="sticky top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-        <div className="flex justify-between items-center max-w-7xl mx-auto px-6 h-20">
-          <div className="flex items-center gap-12">
-            <span className="text-2xl font-extrabold tracking-tighter text-slate-900">
-              DevProgress
-            </span>
-            <div className="hidden md:flex gap-8">
-              {["Solutions", "Integrations", "Testimonials", "Pricing"].map(
-                (item) => (
+    <div
+      className="bg-[#fdf8f8] text-[#1c1b1b] font-sans antialiased overflow-x-hidden pt-20 selection:bg-[#1c1b1b] selection:text-[#fdf8f8]"
+      style={{
+        backgroundImage: "radial-gradient(#e5e2e1 1px, transparent 1px)",
+        backgroundSize: "20px 20px",
+      }}
+    >
+      {/* --- NAVIGATION BAR --- */}
+      <nav className="bg-[#fdf8f8]/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50 border-b border-[#c4c7c7]/30">
+        <div className="max-w-[1280px] mx-auto flex justify-between items-center px-6 py-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-[#444748] hover:opacity-70 transition-opacity md:hidden"
+              aria-label="Toggle Menu"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            <div className="font-semibold text-2xl md:text-3xl text-black tracking-tighter">
+              Progress Dev.
+            </div>
+          </div>
+
+          {/* Desktop Links */}
+          <div className="hidden md:flex gap-8 items-center">
+            {["Home", "About us", "How we work", "Services", "Portfolio"].map(
+              (item, idx) => (
+                <a
+                  key={idx}
+                  className={`${idx === 0 ? "text-black font-bold" : "text-[#444748]"} hover:opacity-70 transition-opacity text-base font-medium`}
+                  href="#"
+                >
+                  {item}
+                </a>
+              ),
+            )}
+          </div>
+
+          <button className="bg-black text-white rounded-full px-6 py-2.5 text-xs font-semibold hover:opacity-70 transition-opacity hidden md:block">
+            Akses Platform
+          </button>
+        </div>
+
+        {/* Mobile Dropdown Links */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden border-t border-[#c4c7c7]/20 bg-[#fdf8f8] px-6 py-4 flex flex-col gap-4"
+            >
+              {["Home", "About us", "How we work", "Services", "Portfolio"].map(
+                (item, idx) => (
                   <a
-                    key={item}
+                    key={idx}
+                    className="text-[#444748] text-base font-medium block"
                     href="#"
-                    className="text-slate-500 font-medium text-sm hover:text-blue-600 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     {item}
                   </a>
                 ),
               )}
-            </div>
-          </div>
-          <div className="flex items-center gap-6">
-            <Link href="/auth/login">
-              <button className="px-6 py-2.5 bg-blue-600 text-white rounded-full text-sm font-bold hover:shadow-lg hover:shadow-blue-200 transition-all active:scale-95 flex items-center gap-2">
-                Get Started <ArrowRight size={16} />
+              <button className="bg-black text-white w-full rounded-full py-3 text-sm font-semibold mt-2">
+                Akses Platform
               </button>
-            </Link>
-          </div>
-        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative pt-20 pb-32 overflow-hidden">
-        {/* Background Decorative Blur */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-blue-50/50 blur-[120px] -z-10 rounded-full" />
-
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[11px] font-bold uppercase tracking-widest mb-8 border border-blue-100"
-          >
-            <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
-            Bondly for Technical Execution
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 max-w-5xl mx-auto mb-8 leading-[1.1]"
-          >
-            Streamline Technical Execution with{" "}
-            <span className="text-blue-600">DevProgress</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto mb-12 leading-relaxed"
-          >
-            The all-in-one platform for admins, developers, and stakeholders to
-            track progress, manage tasks, and deliver faster.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="flex flex-col sm:flex-row justify-center gap-4 mb-20"
-          >
-            <button className="px-10 py-4 bg-slate-900 text-white rounded-full font-bold shadow-2xl shadow-slate-200 hover:bg-blue-600 hover:shadow-blue-100 transition-all">
-              Start Free Trial
-            </button>
-            <button className="px-10 py-4 bg-white text-slate-900 border border-slate-200 rounded-full font-bold hover:bg-slate-50 transition-all">
-              View Demo
-            </button>
-          </motion.div>
-
-          {/* Hero Image Mockup */}
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 1, ease: "circOut" }}
-            className="relative max-w-5xl mx-auto"
-          >
-            <div className="absolute inset-0 bg-blue-600/5 blur-[100px] rounded-full" />
-            <div className="relative z-10 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2">
-              <img
-                alt="Dashboard Preview"
-                className="w-full rounded-xl shadow-inner"
-                src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=2426"
-              />
-              {/* Floating Badge */}
-              <div className="absolute -left-10 top-1/4 bg-white p-5 rounded-2xl shadow-2xl border border-slate-100 hidden lg:block">
-                <p className="text-blue-600 font-black text-2xl">95% Faster</p>
-                <p className="text-slate-400 text-xs font-bold uppercase tracking-wider">
-                  Deployment Speed
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Metrics Strip */}
-      <section className="py-16 bg-blue-600">
-        <motion.div
-          variants={staggerContainer}
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true }}
-          className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12"
-        >
-          <MetricCard value="42+" label="Active Initiatives" />
-          <MetricCard value="6.5M+" label="Commits Tracked" />
-          <MetricCard value="12k+" label="Monthly Users" />
-          <MetricCard value="2.4x" label="Velocity Increase" />
-        </motion.div>
-      </section>
-
-      {/* Capabilities Section */}
-      <section className="py-32 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-24 items-start">
-          <motion.div
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            <motion.h2
-              variants={fadeIn}
-              className="text-4xl md:text-5xl font-bold text-slate-900 mb-6"
-            >
-              Our Capabilities
-            </motion.h2>
-            <motion.p
-              variants={fadeIn}
-              className="text-lg text-slate-500 mb-16 leading-relaxed"
-            >
-              Focus on what matters most. Our tailored views ensure every
-              stakeholder has the context they need without the noise.
-            </motion.p>
-
-            <div className="space-y-12">
-              <CapabilityItem
-                icon={ShieldCheck}
-                title="For Admins"
-                description="Global project overview and user management. Control permissions, track organization-wide velocity, and manage resource allocation at scale."
-              />
-              <CapabilityItem
-                icon={Terminal}
-                title="For Developers"
-                description="Interactive Kanban boards and task automation. Focus on code with seamless CI/CD integration and automated status updates."
-              />
-              <CapabilityItem
-                icon={Activity}
-                title="For Stakeholders"
-                description="Real-time progress tracking and direct feedback loops. Stay informed with high-level summaries and provide input without leaving the platform."
-              />
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="sticky top-32 lg:mt-0 mt-12"
-          >
-            <div className="rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-white p-3">
-              <img
-                alt="Kanban board feature"
-                className="w-full rounded-2xl"
-                src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&q=80&w=2340"
-              />
-            </div>
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-600/10 rounded-full blur-3xl -z-10" />
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="max-w-7xl mx-auto bg-slate-900 rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-600/20 blur-[120px]" />
-          <div className="relative z-10">
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-8 tracking-tight">
-              Ready to accelerate your team?
-            </h2>
-            <p className="text-slate-400 text-lg mb-12 max-w-2xl mx-auto">
-              Join over 1,500 organizations using DevProgress to deliver
-              technical excellence every single day.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-6">
-              <button className="px-12 py-4 bg-blue-600 text-white rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/40 transition-all active:scale-95">
-                Create Account
-              </button>
-              <button className="px-12 py-4 bg-transparent text-white border border-slate-700 rounded-full font-bold text-lg hover:bg-white/5 transition-all">
-                Talk to Sales
-              </button>
-            </div>
+      {/* --- HERO SECTION --- */}
+      <header className="px-6 py-12 md:py-24 max-w-[1280px] mx-auto relative flex flex-col md:flex-row gap-12 items-center">
+        {/* Left Grid: Text Content */}
+        <div className="flex-1 space-y-6 relative z-10">
+          <div className="inline-flex items-center border border-[#c4c7c7] rounded-full px-4 py-1">
+            <span className="text-[12px] font-semibold text-[#444748] uppercase tracking-wider">
+              WELCOME TO PROGRESS DEV
+            </span>
           </div>
-        </motion.div>
-      </section>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-100 pt-24 pb-12 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-20">
-            <div className="col-span-2 md:col-span-1">
-              <span className="text-2xl font-black tracking-tighter text-slate-900 mb-6 block">
-                DevProgress
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight uppercase text-black relative leading-[1.1]">
+            MEMBANGUN TRANSPARANSI & KEPERCAYAAN STAKEHOLDER
+            <svg
+              className="absolute -right-4 md:-right-12 top-1/2 w-16 h-16 text-black hidden lg:block"
+              fill="none"
+              viewBox="0 0 100 100"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M50 5L60 40L95 50L60 60L50 95L40 60L5 50L40 40L50 5Z"
+                stroke="currentColor"
+                strokeJoin="round"
+                strokeWidth="2"
+              ></path>
+              <path
+                d="M50 20V80M20 50H80M30 30L70 70M30 70L70 30"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeWidth="1"
+              ></path>
+            </svg>
+          </h1>
+
+          <p className="text-lg md:text-xl text-[#444748] max-w-lg leading-relaxed">
+            Pantau setiap fase pengembangan aplikasi dengan mudah. Progress Dev
+            menjembatani tim developer dan stakeholder melalui pembaruan
+            real-time, memastikan visi Anda terwujud tanpa miskomunikasi.
+          </p>
+
+          <div className="flex items-center gap-6 pt-4 relative">
+            <button className="bg-black text-white rounded-full px-6 py-3.5 text-xs font-semibold flex items-center gap-2 hover:opacity-80 transition-opacity group">
+              Lihat Repositori / Coba Sekarang
+              <span className="bg-white text-black rounded-full p-1 flex items-center justify-center transition-transform group-hover:rotate-45">
+                <ArrowUpRight size={14} />
               </span>
-              <p className="text-slate-500 text-sm leading-relaxed mb-6">
-                Empowering teams to move faster and build better together.
-              </p>
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-blue-600 cursor-pointer transition-colors">
-                  <Globe size={18} />
+            </button>
+            {/* Hand-drawn decorative arrow wrapper */}
+            <svg
+              className="w-12 h-12 text-[#444748] absolute left-64 top-10 hidden sm:block opacity-60"
+              fill="none"
+              viewBox="0 0 50 50"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5 5Q20 30 45 45M45 45L30 40M45 45L40 30"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeJoin="round"
+                strokeWidth="2"
+              ></path>
+            </svg>
+          </div>
+        </div>
+
+        {/* Right Grid: Visual Card Structure */}
+        <div className="flex-1 relative w-full flex justify-center md:justify-end mt-12 md:mt-0">
+          {/* Badge Transparansi */}
+          <div className="absolute -top-8 -left-4 md:-left-12 bg-white border border-[#c4c7c7] rounded-2xl p-4 shadow-md z-20 flex flex-col items-center rotate-[-5deg]">
+            <span className="text-3xl md:text-4xl font-bold text-black tracking-tight">
+              250+
+            </span>
+            <span className="text-[12px] font-semibold text-[#444748] text-center mt-1">
+              100% Transparansi Proyek
+            </span>
+            <div className="flex -space-x-2 mt-3">
+              {[0, 1, 2].map((num) => (
+                <div
+                  key={num}
+                  className="w-8 h-8 rounded-full border-2 border-white bg-neutral-300 overflow-hidden"
+                >
+                  <div className="w-full h-full bg-neutral-400 flex items-center justify-center text-[10px] text-white">
+                    Dev
+                  </div>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-blue-600 cursor-pointer transition-colors">
-                  <Monitor size={18} />
-                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Main Visual Display Placeholder */}
+          <div className="relative w-full max-w-[400px] aspect-[4/5] rounded-[3rem] overflow-hidden bg-[#e5e2e1] shadow-xl">
+            <div className="w-full h-full bg-gradient-to-tr from-neutral-400 to-neutral-200 flex items-center justify-center p-8 text-center text-neutral-600 font-medium">
+              [Visual Grid Layout Representation Component]
+            </div>
+          </div>
+
+          <div className="absolute bottom-8 -right-4 md:right-8 bg-black text-white px-6 py-3 rounded-full text-xs font-semibold z-20 shadow-lg">
+            Solusi Tracking Development
+          </div>
+        </div>
+      </header>
+
+      {/* --- TEXT MARQUEE --- */}
+      <section className="border-y border-[#c4c7c7]/30 py-6 overflow-hidden bg-white mt-12">
+        <div className="flex whitespace-nowrap opacity-50 px-4 animate-[marquee_20s_linear_infinite] gap-12 text-2xl md:text-4xl font-medium items-center tracking-tighter">
+          <span className="italic">* Real-time Tracking</span>
+          <span>*</span>
+          <span className="italic">Task Management</span>
+          <span>*</span>
+          <span className="font-bold">Client Portal</span>
+          <span>*</span>
+          <span className="font-bold">Seamless Communication *</span>
+        </div>
+      </section>
+
+      {/* --- BENTO ABOUT SECTION --- */}
+      <section className="px-6 py-20 max-w-[1280px] mx-auto">
+        <div className="inline-flex items-center border border-[#c4c7c7] rounded-full px-4 py-1 mb-8">
+          <span className="text-[12px] font-semibold text-[#444748] uppercase tracking-wider">
+            ABOUT PROGRESS DEV
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          {/* Left Text Intro */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInUpVariants}
+            className="md:col-span-5 flex flex-col justify-center space-y-6 relative"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-black leading-tight">
+              Kenali Progress Dev: Mitra Manajemen Proyek Anda
+            </h2>
+            <p className="text-base text-[#444748] leading-relaxed">
+              Kami mengerti bahwa pertanyaan &ldquo;sampai mana
+              progresnya?&rdquo; sering kali menghambat produktivitas. Progress
+              Dev hadir bukan sekadar sebagai tool, melainkan sebagai jembatan
+              komunikasi. Kami menyajikan visibilitas penuh atas status
+              pengembangan aplikasi agar tim teknis bisa fokus coding dan
+              stakeholder bisa tenang memantau hasil.
+            </p>
+          </motion.div>
+
+          {/* Right Grid Graphics (Bento Arrangement) */}
+          <div className="md:col-span-7 grid grid-cols-2 gap-4 min-h-[350px]">
+            <div className="bg-neutral-800 rounded-[24px] flex items-center justify-center text-white/40 font-mono text-xs text-center p-4">
+              [Collab Asset Grid Block]
+            </div>
+            <div className="grid grid-rows-2 gap-4">
+              <div className="bg-neutral-300 rounded-[24px] flex items-center justify-center text-neutral-600 font-mono text-xs text-center p-4">
+                [Workspace Asset Block]
+              </div>
+              <div className="bg-neutral-200 rounded-[24px] flex items-center justify-center text-neutral-600 font-mono text-xs text-center p-4">
+                [Meeting Asset Block]
               </div>
             </div>
-            {["Product", "Support", "Company"].map((title) => (
-              <div key={title}>
-                <h5 className="font-bold text-slate-900 mb-6">{title}</h5>
-                <ul className="space-y-4 text-sm text-slate-500">
-                  <li>
-                    <a href="#" className="hover:text-blue-600">
-                      Feature Link
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-blue-600">
-                      Platform Overview
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:text-blue-600">
-                      Documentation
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            ))}
           </div>
-          <div className="border-t border-slate-50 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[12px] text-slate-400 font-medium">
-            <p>© 2024 DevProgress Inc. All rights reserved.</p>
-            <div className="flex gap-8">
-              <a href="#" className="hover:text-slate-900">
-                Privacy Policy
-              </a>
-              <a href="#" className="hover:text-slate-900">
-                Terms of Service
-              </a>
-              <a href="#" className="hover:text-slate-900">
-                Cookie Settings
-              </a>
+
+          {/* Full Width Highlight Statistics Banner */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUpVariants}
+            className="md:col-span-12 bg-black text-white rounded-[2rem] p-8 md:p-12 mt-4 relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-8"
+          >
+            {/* Background vector aesthetics decor */}
+            <svg
+              className="absolute bottom-0 right-0 w-1/2 h-full text-white/5 pointer-events-none"
+              fill="none"
+              preserveAspectRatio="none"
+              viewBox="0 0 200 100"
+            >
+              <path
+                d="M0,100 C50,80 100,120 150,80 C200,40 250,100 300,60"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              ></path>
+              <path
+                d="M0,100 C50,60 100,140 150,60 C200,0 250,120 300,40"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              ></path>
+            </svg>
+
+            <div className="relative z-10">
+              <div className="text-6xl md:text-7xl font-bold tracking-tighter">
+                0%
+              </div>
+              <div className="text-base text-[#e5e2e1] mt-2 font-medium">
+                Miskomunikasi antara Dev & Klien
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2.5 relative z-10 max-w-lg justify-start md:justify-end">
+              {[
+                "REAL-TIME UPDATE",
+                "KANBAN BOARD",
+                "MILESTONES",
+                "BUG TRACKING",
+                "SPRINT REPORTS",
+                "GITHUB INTEGRATION",
+              ].map((tag, idx) => (
+                <span
+                  key={idx}
+                  className={`rounded-full px-5 py-2 text-[11px] font-bold tracking-wider uppercase ${idx === 1 || idx === 4 ? "bg-white text-black" : "bg-white/10 border border-white/20 text-white"}`}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* --- PROCESS SECTION WITH SLANTED CARDS --- */}
+      <section className="px-6 py-20 max-w-[1280px] mx-auto relative overflow-hidden">
+        <div className="inline-flex items-center border border-[#c4c7c7] rounded-full px-4 py-1 mb-8">
+          <span className="text-[12px] font-semibold text-[#444748] uppercase tracking-wider">
+            HOW IT WORKS
+          </span>
+        </div>
+
+        <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-black max-w-2xl mb-16 relative z-10">
+          Pantau dari baris kode pertama hingga peluncuran
+        </h2>
+
+        <div className="relative w-full max-w-4xl mx-auto flex flex-col gap-12 py-8">
+          {/* Central Path Grid Tracker for Desktop Viewport */}
+          <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[2px] bg-dashed-path border-l-2 border-dashed border-[#e5e2e1] hidden md:block" />
+
+          {/* Card Engine Loop Mapping */}
+          {STEPS.map((step, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: idx * 0.1 }}
+              className={`relative z-10 w-full max-w-xs bg-white rounded-2xl border border-[#c4c7c7] p-8 shadow-sm transform transition-all duration-300 ${step.rotate} ${step.align}`}
+            >
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-[#fdf8f8] rounded-full border border-[#c4c7c7] flex items-center justify-center">
+                <div className="w-2 h-2 bg-black rounded-full" />
+              </div>
+              <div className="text-4xl font-bold text-[#e5e2e1] tracking-tight">
+                {step.id}
+              </div>
+              <h3 className="text-lg font-bold text-black mt-2">
+                {step.title}
+              </h3>
+              <p className="text-sm text-[#444748] mt-3 leading-relaxed">
+                {step.desc}
+              </p>
+            </motion.div>
+          ))}
+
+          <div className="text-center text-3xl md:text-4xl font-medium text-[#c4c7c7] mt-12 rotate-[-2deg] italic tracking-tight">
+            &ldquo;No more &apos;how is the progress?&apos; emails.&rdquo;
+          </div>
+        </div>
+      </section>
+
+      {/* --- DARK MODE SERVICES CORE FEATURES GRID --- */}
+      <section className="bg-black text-white py-24 mt-12">
+        <div className="px-6 max-w-[1280px] mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8">
+            <div className="space-y-6 max-w-xl">
+              <div className="inline-flex items-center border border-white/20 rounded-full px-4 py-1">
+                <span className="text-[12px] font-semibold text-[#e5e2e1] uppercase tracking-wider">
+                  CORE FEATURES
+                </span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+                Dirancang khusus untuk transparansi, bukan sekadar pelaporan
+              </h2>
+            </div>
+            <p className="text-sm text-[#e5e2e1] max-w-sm leading-relaxed">
+              Progress Dev menyediakan ekosistem lengkap untuk menjaga
+              ekspektasi dan memberikan visibilitas penuh kepada klien Anda.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {FEATURES.map((feat, idx) => {
+              const IconComp = feat.icon;
+              return (
+                <div
+                  key={idx}
+                  className="border border-white/10 rounded-[24px] p-8 bg-white/5 hover:bg-white/10 transition-colors group"
+                >
+                  <IconComp
+                    className="w-8 h-8 text-[#e5e2e1] mb-6 transform group-hover:scale-110 transition-transform"
+                    strokeWidth={1.5}
+                  />
+                  <h3 className="text-lg font-bold mb-2 tracking-tight">
+                    {feat.title}
+                  </h3>
+                  <p className="text-sm text-[#e5e2e1]/70 leading-relaxed">
+                    {feat.desc}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* --- FOOTER COMPONENT + END CTA --- */}
+      <footer className="bg-white border-t border-[#c4c7c7]/30 w-full rounded-t-[24px] mt-24">
+        <div className="px-6 py-20 max-w-[1280px] mx-auto">
+          {/* Internal High-impact Dark Box Action Call Container */}
+          <div className="bg-black text-white rounded-[2rem] p-12 flex flex-col items-center text-center mb-16 relative overflow-hidden shadow-xl">
+            <div
+              className="absolute inset-0 opacity-5 pointer-events-none"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(45deg, transparent, transparent 10px, #ffffff 10px, #ffffff 11px)",
+              }}
+            />
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4 relative z-10 max-w-2xl">
+              Mari tingkatkan standar komunikasi proyek Anda
+            </h2>
+            <p className="text-sm md:text-base text-[#e5e2e1] mb-8 max-w-md relative z-10 leading-relaxed">
+              Ingin melihat bagaimana Progress Dev dapat menghilangkan hambatan
+              komunikasi antara developer dan stakeholder?
+            </p>
+            <button className="bg-white text-black rounded-full px-8 py-4 text-xs font-semibold flex items-center gap-2 hover:opacity-90 transition-opacity relative z-10">
+              Kunjungi GitHub / Akses Platform
+              <ArrowRight size={14} />
+            </button>
+          </div>
+
+          {/* Navigational Anchor Grid Hierarchy */}
+          <div className="flex flex-col md:flex-row justify-between items-start gap-8 pt-8 border-t border-[#c4c7c7]/20">
+            <div className="text-2xl font-bold tracking-tighter text-black">
+              Progress Dev.
+            </div>
+            <div className="flex flex-col sm:flex-row gap-12 font-medium text-sm text-[#444748]">
+              <div className="flex flex-col gap-2.5">
+                <a className="hover:text-black transition-colors" href="#">
+                  Work
+                </a>
+                <a className="hover:text-black transition-colors" href="#">
+                  Services
+                </a>
+              </div>
+              <div className="flex flex-col gap-2.5">
+                <a className="hover:text-black transition-colors" href="#">
+                  Process
+                </a>
+                <a className="hover:text-black transition-colors" href="#">
+                  About
+                </a>
+              </div>
+              <div className="flex flex-col gap-2.5">
+                <a className="text-black underline font-semibold" href="#">
+                  Contact
+                </a>
+              </div>
+            </div>
+            <div className="text-xs text-[#444748] opacity-70">
+              &copy; 2026 Progress Dev. All rights reserved.
             </div>
           </div>
         </div>
