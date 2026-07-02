@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { CreateProjectDto, UpdateProjectDto } from './dto/project.dto';
+import { CreateProjectDto, UpdateProjectDto, CreateBriefDto } from './dto/project.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../guards/roles.decorator';
@@ -60,5 +60,13 @@ export class ProjectsController {
   @ApiOperation({ summary: 'Delete project' })
   remove(@Param('id') id: string, @CurrentUser() user: any) {
     return this.projectsService.remove(id, user.id);
+  }
+
+  @Post(':id/briefs')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a new project brief (Stakeholder)' })
+  createBrief(@Param('id') id: string, @Body() createBriefDto: CreateBriefDto) {
+    return this.projectsService.createBrief(id, createBriefDto);
   }
 }

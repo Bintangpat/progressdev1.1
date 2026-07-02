@@ -3,535 +3,517 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Menu,
-  X,
-  ArrowUpRight,
   ArrowRight,
   Star,
-  Paintbrush,
-  Globe,
-  Code,
-  Smartphone,
-  Terminal,
+  Plus,
+  Minus,
+  Bolt,
+  FolderOpen,
+  Bot,
+  Rocket,
+  ShieldCheck,
+  Network,
 } from "lucide-react";
+import Link from "next/link";
 
-// Data untuk Bento Core Features
-const FEATURES = [
-  {
-    icon: Star,
-    title: "Real-time Dashboard",
-    desc: "Visibilitas instan untuk status proyek, progres sprint, dan metrik kesehatan development.",
-  },
-  {
-    icon: Paintbrush,
-    title: "Milestone Tracking",
-    desc: "Pantau pencapaian besar dan pastikan pengerjaan fitur berjalan sesuai tenggat waktu.",
-  },
-  {
-    icon: Globe,
-    title: "Client Portal",
-    desc: "Akses khusus dan aman bagi stakeholder untuk melihat update tanpa mengganggu alur kerja developer.",
-  },
-  {
-    icon: Code,
-    title: "Task & Bug Management",
-    desc: "Kelola backlog, perbaikan bug, dan penugasan tim secara terstruktur.",
-  },
-  {
-    icon: Smartphone,
-    title: "Automated Reports",
-    desc: "Hasilkan ringkasan progres mingguan atau bulanan secara otomatis dengan satu klik.",
-  },
-  {
-    icon: Terminal,
-    title: "Feedback Loop",
-    desc: "Stakeholder dapat meninggalkan komentar atau revisi langsung pada task atau fitur tertentu.",
-  },
-];
-
-// Data untuk Slanted Cards (How it works)
-const STEPS = [
+// Data untuk section Outcomes (Accordion)
+const outcomesData = [
   {
     id: "01",
-    title: "01 Inisiasi",
-    desc: "Tambahkan stakeholder, definisikan scope proyek, dan tetapkan milestone utama pengembangan.",
-    rotate: "hover:rotate-0 rotate-[3deg]",
-    align: "md:self-end md:mr-24",
+    title: "ACCELERATION SPRINTS™",
+    description:
+      "Test a new technology initiative in 1-2 weeks, create a strategy to increase key metrics, identify and eliminate delivery bottlenecks.",
+    colorClass: "bg-[#ffa454] text-[#713b00] dark:bg-[#ffa454]/90",
+    textClass: "text-[#713b00]",
+    accentBg: "bg-[#ffdcc3]",
   },
   {
     id: "02",
-    title: "02 Tracking",
-    desc: "Tim developer memperbarui status task dan sprint secara progresif di dalam sistem.",
-    rotate: "hover:rotate-0 rotate-[-2deg]",
-    align: "md:self-start md:ml-12",
+    title: "EFFICIENT DEVELOPMENT",
+    description:
+      "Scale your delivery velocity with integrated high-performing engineers. Minimize tech debt while increasing feature deployment speed seamlessly.",
+    colorClass: "bg-[#cabeff] text-[#1c0062] dark:bg-[#4a00e0] dark:text-white",
+    textClass: "text-[#3300a3] dark:text-[#f0dbff]",
+    accentBg: "bg-[#e6deff]",
   },
   {
     id: "03",
-    title: "03 Review",
-    desc: "Stakeholder dapat memantau timeline, melihat hasil kerja, dan memberikan feedback langsung.",
-    rotate: "hover:rotate-0 rotate-[4deg]",
-    align: "md:self-end md:mr-32",
+    title: "SPECIALISTS ON DEMAND",
+    description:
+      "Gain immediate access to deep domain experts in cloud architecture, cryptography, and complex systems engineering without the hiring overhead.",
+    colorClass: "bg-[#ddb7ff] text-[#2c0050] dark:bg-[#6d00ba] dark:text-white",
+    textClass: "text-[#4e0086] dark:text-[#f0dbff]",
+    accentBg: "bg-[#f0dbff]",
   },
   {
     id: "04",
-    title: "04 Delivery",
-    desc: "Aplikasi siap dirilis. Sistem menyediakan laporan otomatis dari awal hingga akhir siklus development.",
-    rotate: "hover:rotate-0 rotate-[-3deg]",
-    align: "md:self-start md:ml-24",
+    title: "DATA & AI",
+    description:
+      "Integrate production-grade LLM chains, machine learning workflows, and robust data pipelines into your existing product lines securely.",
+    colorClass: "bg-[#ffdad6] text-[#93000a] dark:bg-[#ba1a1a] dark:text-white",
+    textClass: "text-[#ba1a1a] dark:text-[#ffdad6]",
+    accentBg: "bg-[#ffdad6]",
   },
 ];
 
-export default function ProgressDevLanding() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+export default function DevProgressLanding() {
+  const [activeAccordion, setActiveAccordion] = useState<string>("01");
 
-  // Varian animasi global untuk Scroll Reveal
-  const fadeInUpVariants = {
-    hidden: { opacity: 0, y: 40 },
-    visible: {
+  // Variasi animasi untuk staggered reveal load
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.15 } as const,
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    show: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.8, ease: "easeOut" },
+      transition: { type: "spring", stiffness: 90, damping: 14 } as const,
     },
   };
 
   return (
-    <div
-      className="bg-[#fdf8f8] text-[#1c1b1b] font-sans antialiased overflow-x-hidden pt-20 selection:bg-[#1c1b1b] selection:text-[#fdf8f8]"
-      style={{
-        backgroundImage: "radial-gradient(#e5e2e1 1px, transparent 1px)",
-        backgroundSize: "20px 20px",
-      }}
-    >
-      {/* --- NAVIGATION BAR --- */}
-      <nav className="bg-[#fdf8f8]/80 backdrop-blur-md fixed top-0 left-0 right-0 z-50 border-b border-[#c4c7c7]/30">
-        <div className="max-w-[1280px] mx-auto flex justify-between items-center px-6 py-4">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-[#444748] hover:opacity-70 transition-opacity md:hidden"
-              aria-label="Toggle Menu"
+    <div className="bg-[#fcf9f8] text-[#1c1b1b] antialiased selection:bg-[#3300a3]/10 overflow-x-hidden min-h-screen ">
+      {/* TopNavBar */}
+      <nav className="fixed top-0 w-full z-50 bg-white/60 backdrop-blur-xl border-b border-[#f0eded] shadow-sm">
+        <div className="flex justify-between items-center h-20 px-6 md:px-20 max-w-[1280px] mx-auto">
+          <div className="text-[32px] font-bold text-[#1c1b1b] tracking-tight">
+            DevProgress
+          </div>
+          <div className="hidden lg:flex items-center gap-8">
+            <a
+              className="text-[16px] text-[#3300a3] font-bold border-b-2 border-[#3300a3] py-1"
+              href="#case-studies"
             >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              Case Studies
+            </a>
+            <a
+              className="text-[16px] text-[#484456] hover:text-[#3300a3] transition-all duration-300"
+              href="#services"
+            >
+              Services
+            </a>
+            <a
+              className="text-[16px] text-[#484456] hover:text-[#3300a3] transition-all duration-300"
+              href="#expertise"
+            >
+              Expertise
+            </a>
+            <a
+              className="text-[16px] text-[#484456] hover:text-[#3300a3] transition-all duration-300"
+              href="#how-we-deliver"
+            >
+              How we deliver
+            </a>
+            <a
+              className="text-[16px] text-[#484456] hover:text-[#3300a3] transition-all duration-300"
+              href="#insights"
+            >
+              Insights
+            </a>
+            <a
+              className="text-[16px] text-[#484456] hover:text-[#3300a3] transition-all duration-300"
+              href="#about"
+            >
+              About
+            </a>
+          </div>
+          <Link href="/auth/login">
+            <button className="bg-[#3300a3] text-white px-6 py-3 rounded-full text-[14px] font-semibold hover:bg-[#3300a3]/90 hover:scale-105 active:scale-95 transition-all duration-300 shadow-md shadow-[#3300a3]/10">
+              Get in touch
             </button>
-            <div className="font-semibold text-2xl md:text-3xl text-black tracking-tighter">
-              Progress Dev.
-            </div>
-          </div>
-
-          {/* Desktop Links */}
-          <div className="hidden md:flex gap-8 items-center">
-            {["Home", "About us", "How we work", "Services", "Portfolio"].map(
-              (item, idx) => (
-                <a
-                  key={idx}
-                  className={`${idx === 0 ? "text-black font-bold" : "text-[#444748]"} hover:opacity-70 transition-opacity text-base font-medium`}
-                  href="#"
-                >
-                  {item}
-                </a>
-              ),
-            )}
-          </div>
-
-          <button className="bg-black text-white rounded-full px-6 py-2.5 text-xs font-semibold hover:opacity-70 transition-opacity hidden md:block">
-            Akses Platform
-          </button>
+          </Link>
         </div>
-
-        {/* Mobile Dropdown Links */}
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t border-[#c4c7c7]/20 bg-[#fdf8f8] px-6 py-4 flex flex-col gap-4"
-            >
-              {["Home", "About us", "How we work", "Services", "Portfolio"].map(
-                (item, idx) => (
-                  <a
-                    key={idx}
-                    className="text-[#444748] text-base font-medium block"
-                    href="#"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item}
-                  </a>
-                ),
-              )}
-              <button className="bg-black text-white w-full rounded-full py-3 text-sm font-semibold mt-2">
-                Akses Platform
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </nav>
+      <div className="w-full h-20 bg-white relative" />
+      {/* Hero Section */}
+      <section
+        className="relative pt-40 pb-24 md:pb-32 px-6 md:px-20 bg-cover bg-center"
+        style={{
+          backgroundImage: `url('/image.png')`,
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-[#fcf9f8] to-transparent z-0 pointer-events-none" />
 
-      {/* --- HERO SECTION --- */}
-      <header className="px-6 py-12 md:py-24 max-w-[1280px] mx-auto relative flex flex-col md:flex-row gap-12 items-center">
-        {/* Left Grid: Text Content */}
-        <div className="flex-1 space-y-6 relative z-10">
-          <div className="inline-flex items-center border border-[#c4c7c7] rounded-full px-4 py-1">
-            <span className="text-[12px] font-semibold text-[#444748] uppercase tracking-wider">
-              WELCOME TO PROGRESS DEV
-            </span>
-          </div>
+        <motion.div
+          className="max-w-[1280px] mx-auto relative z-10"
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-10">
+              <motion.h1
+                className="text-[44px] sm:text-[60px] md:text-[72px] font-bold leading-[1.1] tracking-[-0.04em] mb-12 text-[#1c1b1b]"
+                variants={itemVariants}
+              >
+                Build with confidence <br />
+                and deliver on time
+              </motion.h1>
 
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight uppercase text-black relative leading-[1.1]">
-            MEMBANGUN TRANSPARANSI & KEPERCAYAAN STAKEHOLDER
-            <svg
-              className="absolute -right-4 md:-right-12 top-1/2 w-16 h-16 text-black hidden lg:block"
-              fill="none"
-              viewBox="0 0 100 100"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M50 5L60 40L95 50L60 60L50 95L40 60L5 50L40 40L50 5Z"
-                stroke="currentColor"
-                strokeJoin="round"
-                strokeWidth="2"
-              ></path>
-              <path
-                d="M50 20V80M20 50H80M30 30L70 70M30 70L70 30"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeWidth="1"
-              ></path>
-            </svg>
-          </h1>
-
-          <p className="text-lg md:text-xl text-[#444748] max-w-lg leading-relaxed">
-            Pantau setiap fase pengembangan aplikasi dengan mudah. Progress Dev
-            menjembatani tim developer dan stakeholder melalui pembaruan
-            real-time, memastikan visi Anda terwujud tanpa miskomunikasi.
-          </p>
-
-          <div className="flex items-center gap-6 pt-4 relative">
-            <button className="bg-black text-white rounded-full px-6 py-3.5 text-xs font-semibold flex items-center gap-2 hover:opacity-80 transition-opacity group">
-              Lihat Repositori / Coba Sekarang
-              <span className="bg-white text-black rounded-full p-1 flex items-center justify-center transition-transform group-hover:rotate-45">
-                <ArrowUpRight size={14} />
-              </span>
-            </button>
-            {/* Hand-drawn decorative arrow wrapper */}
-            <svg
-              className="w-12 h-12 text-[#444748] absolute left-64 top-10 hidden sm:block opacity-60"
-              fill="none"
-              viewBox="0 0 50 50"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M5 5Q20 30 45 45M45 45L30 40M45 45L40 30"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeJoin="round"
-                strokeWidth="2"
-              ></path>
-            </svg>
-          </div>
-        </div>
-
-        {/* Right Grid: Visual Card Structure */}
-        <div className="flex-1 relative w-full flex justify-center md:justify-end mt-12 md:mt-0">
-          {/* Badge Transparansi */}
-          <div className="absolute -top-8 -left-4 md:-left-12 bg-white border border-[#c4c7c7] rounded-2xl p-4 shadow-md z-20 flex flex-col items-center rotate-[-5deg]">
-            <span className="text-3xl md:text-4xl font-bold text-black tracking-tight">
-              250+
-            </span>
-            <span className="text-[12px] font-semibold text-[#444748] text-center mt-1">
-              100% Transparansi Proyek
-            </span>
-            <div className="flex -space-x-2 mt-3">
-              {[0, 1, 2].map((num) => (
-                <div
-                  key={num}
-                  className="w-8 h-8 rounded-full border-2 border-white bg-neutral-300 overflow-hidden"
-                >
-                  <div className="w-full h-full bg-neutral-400 flex items-center justify-center text-[10px] text-white">
-                    Dev
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Main Visual Display Placeholder */}
-          <div className="relative w-full max-w-[400px] aspect-[4/5] rounded-[3rem] overflow-hidden bg-[#e5e2e1] shadow-xl">
-            <div className="w-full h-full bg-gradient-to-tr from-neutral-400 to-neutral-200 flex items-center justify-center p-8 text-center text-neutral-600 font-medium">
-              [Visual Grid Layout Representation Component]
-            </div>
-          </div>
-
-          <div className="absolute bottom-8 -right-4 md:right-8 bg-black text-white px-6 py-3 rounded-full text-xs font-semibold z-20 shadow-lg">
-            Solusi Tracking Development
-          </div>
-        </div>
-      </header>
-
-      {/* --- TEXT MARQUEE --- */}
-      <section className="border-y border-[#c4c7c7]/30 py-6 overflow-hidden bg-white mt-12">
-        <div className="flex whitespace-nowrap opacity-50 px-4 animate-[marquee_20s_linear_infinite] gap-12 text-2xl md:text-4xl font-medium items-center tracking-tighter">
-          <span className="italic">* Real-time Tracking</span>
-          <span>*</span>
-          <span className="italic">Task Management</span>
-          <span>*</span>
-          <span className="font-bold">Client Portal</span>
-          <span>*</span>
-          <span className="font-bold">Seamless Communication *</span>
-        </div>
-      </section>
-
-      {/* --- BENTO ABOUT SECTION --- */}
-      <section className="px-6 py-20 max-w-[1280px] mx-auto">
-        <div className="inline-flex items-center border border-[#c4c7c7] rounded-full px-4 py-1 mb-8">
-          <span className="text-[12px] font-semibold text-[#444748] uppercase tracking-wider">
-            ABOUT PROGRESS DEV
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {/* Left Text Intro */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeInUpVariants}
-            className="md:col-span-5 flex flex-col justify-center space-y-6 relative"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-black leading-tight">
-              Kenali Progress Dev: Mitra Manajemen Proyek Anda
-            </h2>
-            <p className="text-base text-[#444748] leading-relaxed">
-              Kami mengerti bahwa pertanyaan &ldquo;sampai mana
-              progresnya?&rdquo; sering kali menghambat produktivitas. Progress
-              Dev hadir bukan sekadar sebagai tool, melainkan sebagai jembatan
-              komunikasi. Kami menyajikan visibilitas penuh atas status
-              pengembangan aplikasi agar tim teknis bisa fokus coding dan
-              stakeholder bisa tenang memantau hasil.
-            </p>
-          </motion.div>
-
-          {/* Right Grid Graphics (Bento Arrangement) */}
-          <div className="md:col-span-7 grid grid-cols-2 gap-4 min-h-[350px]">
-            <div className="bg-neutral-800 rounded-[24px] flex items-center justify-center text-white/40 font-mono text-xs text-center p-4">
-              [Collab Asset Grid Block]
-            </div>
-            <div className="grid grid-rows-2 gap-4">
-              <div className="bg-neutral-300 rounded-[24px] flex items-center justify-center text-neutral-600 font-mono text-xs text-center p-4">
-                [Workspace Asset Block]
-              </div>
-              <div className="bg-neutral-200 rounded-[24px] flex items-center justify-center text-neutral-600 font-mono text-xs text-center p-4">
-                [Meeting Asset Block]
-              </div>
-            </div>
-          </div>
-
-          {/* Full Width Highlight Statistics Banner */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            className="md:col-span-12 bg-black text-white rounded-[2rem] p-8 md:p-12 mt-4 relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-8"
-          >
-            {/* Background vector aesthetics decor */}
-            <svg
-              className="absolute bottom-0 right-0 w-1/2 h-full text-white/5 pointer-events-none"
-              fill="none"
-              preserveAspectRatio="none"
-              viewBox="0 0 200 100"
-            >
-              <path
-                d="M0,100 C50,80 100,120 150,80 C200,40 250,100 300,60"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              ></path>
-              <path
-                d="M0,100 C50,60 100,140 150,60 C200,0 250,120 300,40"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              ></path>
-            </svg>
-
-            <div className="relative z-10">
-              <div className="text-6xl md:text-7xl font-bold tracking-tighter">
-                0%
-              </div>
-              <div className="text-base text-[#e5e2e1] mt-2 font-medium">
-                Miskomunikasi antara Dev & Klien
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2.5 relative z-10 max-w-lg justify-start md:justify-end">
-              {[
-                "REAL-TIME UPDATE",
-                "KANBAN BOARD",
-                "MILESTONES",
-                "BUG TRACKING",
-                "SPRINT REPORTS",
-                "GITHUB INTEGRATION",
-              ].map((tag, idx) => (
-                <span
-                  key={idx}
-                  className={`rounded-full px-5 py-2 text-[11px] font-bold tracking-wider uppercase ${idx === 1 || idx === 4 ? "bg-white text-black" : "bg-white/10 border border-white/20 text-white"}`}
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* --- PROCESS SECTION WITH SLANTED CARDS --- */}
-      <section className="px-6 py-20 max-w-[1280px] mx-auto relative overflow-hidden">
-        <div className="inline-flex items-center border border-[#c4c7c7] rounded-full px-4 py-1 mb-8">
-          <span className="text-[12px] font-semibold text-[#444748] uppercase tracking-wider">
-            HOW IT WORKS
-          </span>
-        </div>
-
-        <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-black max-w-2xl mb-16 relative z-10">
-          Pantau dari baris kode pertama hingga peluncuran
-        </h2>
-
-        <div className="relative w-full max-w-4xl mx-auto flex flex-col gap-12 py-8">
-          {/* Central Path Grid Tracker for Desktop Viewport */}
-          <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[2px] bg-dashed-path border-l-2 border-dashed border-[#e5e2e1] hidden md:block" />
-
-          {/* Card Engine Loop Mapping */}
-          {STEPS.map((step, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, delay: idx * 0.1 }}
-              className={`relative z-10 w-full max-w-xs bg-white rounded-2xl border border-[#c4c7c7] p-8 shadow-sm transform transition-all duration-300 ${step.rotate} ${step.align}`}
-            >
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-[#fdf8f8] rounded-full border border-[#c4c7c7] flex items-center justify-center">
-                <div className="w-2 h-2 bg-black rounded-full" />
-              </div>
-              <div className="text-4xl font-bold text-[#e5e2e1] tracking-tight">
-                {step.id}
-              </div>
-              <h3 className="text-lg font-bold text-black mt-2">
-                {step.title}
-              </h3>
-              <p className="text-sm text-[#444748] mt-3 leading-relaxed">
-                {step.desc}
-              </p>
-            </motion.div>
-          ))}
-
-          <div className="text-center text-3xl md:text-4xl font-medium text-[#c4c7c7] mt-12 rotate-[-2deg] italic tracking-tight">
-            &ldquo;No more &apos;how is the progress?&apos; emails.&rdquo;
-          </div>
-        </div>
-      </section>
-
-      {/* --- DARK MODE SERVICES CORE FEATURES GRID --- */}
-      <section className="bg-black text-white py-24 mt-12">
-        <div className="px-6 max-w-[1280px] mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8">
-            <div className="space-y-6 max-w-xl">
-              <div className="inline-flex items-center border border-white/20 rounded-full px-4 py-1">
-                <span className="text-[12px] font-semibold text-[#e5e2e1] uppercase tracking-wider">
-                  CORE FEATURES
-                </span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-                Dirancang khusus untuk transparansi, bukan sekadar pelaporan
-              </h2>
-            </div>
-            <p className="text-sm text-[#e5e2e1] max-w-sm leading-relaxed">
-              Progress Dev menyediakan ekosistem lengkap untuk menjaga
-              ekspektasi dan memberikan visibilitas penuh kepada klien Anda.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {FEATURES.map((feat, idx) => {
-              const IconComp = feat.icon;
-              return (
-                <div
-                  key={idx}
-                  className="border border-white/10 rounded-[24px] p-8 bg-white/5 hover:bg-white/10 transition-colors group"
-                >
-                  <IconComp
-                    className="w-8 h-8 text-[#e5e2e1] mb-6 transform group-hover:scale-110 transition-transform"
-                    strokeWidth={1.5}
-                  />
-                  <h3 className="text-lg font-bold mb-2 tracking-tight">
-                    {feat.title}
-                  </h3>
-                  <p className="text-sm text-[#e5e2e1]/70 leading-relaxed">
-                    {feat.desc}
+              <motion.div
+                className="grid grid-cols-1 md:grid-cols-3 gap-12 items-start mt-16"
+                variants={itemVariants}
+              >
+                <div className="space-y-4">
+                  <p className="text-[#484456] text-[18px] leading-relaxed">
+                    Unlock development capacity, remove biggest delivery
+                    blockers and see your key metrics improve
                   </p>
                 </div>
+                <div className="hidden md:flex items-center justify-center pt-2 text-[#3300a3]">
+                  <motion.div
+                    animate={{ x: [0, 8, 0] }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 1.5,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <ArrowRight className="w-12 h-12" />
+                  </motion.div>
+                </div>
+                <div className="space-y-4">
+                  <p className="text-[#484456] text-[18px] leading-relaxed">
+                    All without refocusing your core team
+                  </p>
+                  <div className="flex items-center gap-3 mt-6">
+                    <div className="bg-[#f0eded] px-3 py-1.5 rounded-lg font-bold text-[18px] text-[#1c1b1b]">
+                      Clutch
+                    </div>
+                    <div>
+                      <div className="text-[#1c1b1b] font-bold text-[16px]">
+                        4.8 / 5
+                      </div>
+                      <div className="flex text-[#904d00] gap-0.5 mt-0.5">
+                        <Star className="w-4 h-4 fill-current" />
+                        <Star className="w-4 h-4 fill-current" />
+                        <Star className="w-4 h-4 fill-current" />
+                        <Star className="w-4 h-4 fill-current" />
+                        <Star className="w-4 h-4 fill-current opacity-50" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Client Logos */}
+      <section
+        id="about"
+        className="py-16 px-6 md:px-20 bg-white border-y border-[#c9c3d9]/30"
+      >
+        <div className="max-w-[1280px] mx-auto text-center">
+          <h2 className="text-[14px] font-bold text-[#797488] mb-10 tracking-[0.15em] uppercase">
+            TRUSTED BY 160+ PRODUCT DEVELOPMENT TEAMS
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 items-center justify-items-center opacity-40">
+            {Array.from({ length: 5 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="h-8 w-32 bg-[#797488]/30 rounded-md animate-pulse"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Value Proposition */}
+      <section
+        id="services"
+        className="py-24 px-6 md:px-20 overflow-hidden bg-white/50"
+      >
+        <div className="max-w-[1280px] mx-auto text-center">
+          <div className="max-w-4xl mx-auto">
+            <h3 className="text-[28px] sm:text-[36px] md:text-[48px] font-semibold text-[#1c1b1b] leading-tight tracking-[-0.02em]">
+              <ArrowRight className="inline-block w-8 h-8 md:w-10 md:h-10 text-[#3300a3] mr-2 align-middle -mt-1" />
+              We help CTOs and product teams speed up{" "}
+              <span className="inline-flex items-center text-[#4a00e0] px-2 py-0.5 rounded-lg bg-[#e6deff] mx-1 font-bold whitespace-nowrap">
+                development <Bolt className="w-5 h-5 ml-1 fill-current" />
+              </span>{" "}
+              modernize{" "}
+              <span className="inline-flex items-center text-[#904d00] px-2 py-0.5 rounded-lg bg-[#ffdcc3] mx-1 font-bold whitespace-nowrap">
+                existing products <FolderOpen className="w-5 h-5 ml-1" />
+              </span>{" "}
+              and adopt{" "}
+              <span className="inline-flex items-center text-[#3300a3] px-2 py-0.5 rounded-lg bg-[#e6deff] mx-1 font-bold whitespace-nowrap">
+                AI <Bot className="w-5 h-5 ml-1" />
+              </span>{" "}
+              so they can{" "}
+              <span className="inline-flex items-center text-[#6900b3] px-2 py-0.5 rounded-lg bg-[#f0dbff] mx-1 font-bold whitespace-nowrap">
+                ship faster <Rocket className="w-5 h-5 ml-1" />
+              </span>{" "}
+              without compromising on quality. That’s our promise.
+            </h3>
+          </div>
+        </div>
+      </section>
+
+      {/* Outcomes Section (Accordion) */}
+      <section id="how-we-deliver" className="py-24 px-6 md:px-20 bg-[#f6f3f2]">
+        <div className="max-w-[1280px] mx-auto">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-16 gap-4">
+            <div>
+              <h2 className="text-[36px] md:text-[48px] font-bold tracking-tight">
+                See tangible outcomes
+              </h2>
+            </div>
+            <span className="text-[14px] font-bold text-[#797488] uppercase tracking-[0.15em]">
+              WHAT WE DO
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {outcomesData.map((item) => {
+              const isOpen = activeAccordion === item.id;
+              return (
+                <motion.div
+                  key={item.id}
+                  layout
+                  onClick={() => setActiveAccordion(isOpen ? "" : item.id)}
+                  className={`rounded-2xl p-6 md:p-8 overflow-hidden relative cursor-pointer border transition-all duration-300 ${
+                    isOpen
+                      ? `${item.colorClass} border-transparent shadow-lg`
+                      : "bg-[#eae7e7]/60 hover:bg-[#eae7e7]/90 border-transparent"
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-4 md:gap-6 z-10">
+                      <span
+                        className={`text-[20px] md:text-[24px] font-bold ${isOpen ? "text-current" : "text-[#797488]"}`}
+                      >
+                        {item.id}
+                      </span>
+                      <h3
+                        className={`text-[20px] md:text-[24px] font-bold uppercase tracking-tight ${isOpen ? "text-current" : "text-[#1c1b1b]"}`}
+                      >
+                        {item.title}
+                      </h3>
+                    </div>
+                    <div className="z-10 text-current p-1">
+                      {isOpen ? (
+                        <Minus className="w-6 h-6" />
+                      ) : (
+                        <Plus className="w-6 h-6 text-[#797488]" />
+                      )}
+                    </div>
+                  </div>
+
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                        animate={{ height: "auto", opacity: 1, marginTop: 24 }}
+                        exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="max-w-2xl z-10 relative"
+                      >
+                        <p className="text-[16px] md:text-[18px] leading-relaxed opacity-90">
+                          {item.description}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Decorative Background Glow Layer */}
+                  {isOpen && (
+                    <motion.div
+                      layoutId="glow"
+                      className={`absolute -right-20 -bottom-20 w-80 h-80 ${item.accentBg} opacity-30 blur-3xl rounded-full pointer-events-none`}
+                    />
+                  )}
+                </motion.div>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* --- FOOTER COMPONENT + END CTA --- */}
-      <footer className="bg-white border-t border-[#c4c7c7]/30 w-full rounded-t-[24px] mt-24">
-        <div className="px-6 py-20 max-w-[1280px] mx-auto">
-          {/* Internal High-impact Dark Box Action Call Container */}
-          <div className="bg-black text-white rounded-[2rem] p-12 flex flex-col items-center text-center mb-16 relative overflow-hidden shadow-xl">
-            <div
-              className="absolute inset-0 opacity-5 pointer-events-none"
-              style={{
-                backgroundImage:
-                  "repeating-linear-gradient(45deg, transparent, transparent 10px, #ffffff 10px, #ffffff 11px)",
-              }}
-            />
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4 relative z-10 max-w-2xl">
-              Mari tingkatkan standar komunikasi proyek Anda
+      {/* Case Studies Section */}
+      <section id="case-studies" className="py-24 px-6 md:px-20 bg-white">
+        <div className="max-w-[1280px] mx-auto">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-20">
+            <h2 className="text-[36px] md:text-[48px] font-bold tracking-tight max-w-xl">
+              Effective software development
             </h2>
-            <p className="text-sm md:text-base text-[#e5e2e1] mb-8 max-w-md relative z-10 leading-relaxed">
-              Ingin melihat bagaimana Progress Dev dapat menghilangkan hambatan
-              komunikasi antara developer dan stakeholder?
-            </p>
-            <button className="bg-white text-black rounded-full px-8 py-4 text-xs font-semibold flex items-center gap-2 hover:opacity-90 transition-opacity relative z-10">
-              Kunjungi GitHub / Akses Platform
-              <ArrowRight size={14} />
-            </button>
+            <div className="flex flex-col items-start lg:items-end gap-6 w-full lg:w-auto">
+              <p className="text-[#484456] text-[16px] lg:text-right max-w-sm">
+                160+ product development teams made their product competitive
+                with our help
+              </p>
+              <button className="bg-[#313030] text-white px-8 py-4 rounded-lg text-[14px] font-bold uppercase tracking-wider hover:bg-[#1c1b1b] transition-all">
+                Go to cases
+              </button>
+            </div>
           </div>
 
-          {/* Navigational Anchor Grid Hierarchy */}
-          <div className="flex flex-col md:flex-row justify-between items-start gap-8 pt-8 border-t border-[#c4c7c7]/20">
-            <div className="text-2xl font-bold tracking-tighter text-black">
-              Progress Dev.
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            {/* Left Column Cluster */}
+            <div className="lg:col-span-5 flex flex-col gap-10">
+              {/* Case 1 */}
+              <div className="group cursor-pointer">
+                <div className="bg-[#f6f3f2] rounded-3xl mb-6 overflow-hidden relative min-h-[320px] flex items-end border border-[#f0eded]">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 bg-slate-200"
+                    style={{
+                      backgroundImage: `url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600&auto=format&fit=crop')`,
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-[#3300a3] font-bold text-[16px]">
+                    <ArrowRight className="w-4 h-4 shrink-0" />
+                    <span>
+                      SEPA certification enabled one bank to reach 36+ countries
+                    </span>
+                  </div>
+                  <div className="text-[12px] font-bold text-[#797488] tracking-widest uppercase pl-6">
+                    UNDER NDA
+                  </div>
+                </div>
+              </div>
+
+              {/* Case 2 */}
+              <div className="group cursor-pointer">
+                <div className="bg-[#f6f3f2] rounded-3xl p-10 mb-6 overflow-hidden relative min-h-[320px] flex items-center justify-center border border-[#f0eded]">
+                  <motion.div
+                    whileHover={{ rotate: -3, scale: 1.02 }}
+                    className="bg-white/70 backdrop-blur-md p-6 rounded-2xl shadow-xl w-64 z-10 border border-white/40 transform -rotate-6 transition-transform"
+                  >
+                    <div className="w-full h-28 bg-[#3300a3]/10 rounded mb-4" />
+                    <div className="h-4 w-3/4 bg-[#1c1b1b]/10 rounded mb-2" />
+                    <div className="h-4 w-1/2 bg-[#1c1b1b]/5 rounded" />
+                  </motion.div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-[#3300a3] font-bold text-[16px]">
+                    <ArrowRight className="w-4 h-4 shrink-0" />
+                    <span>
+                      A remade backend cut eSky's time to market by 75%
+                    </span>
+                  </div>
+                  <div className="text-[12px] font-bold text-[#797488] tracking-widest uppercase pl-6">
+                    ESKY.PL
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-12 font-medium text-sm text-[#444748]">
-              <div className="flex flex-col gap-2.5">
-                <a className="hover:text-black transition-colors" href="#">
-                  Work
-                </a>
-                <a className="hover:text-black transition-colors" href="#">
-                  Services
-                </a>
-              </div>
-              <div className="flex flex-col gap-2.5">
-                <a className="hover:text-black transition-colors" href="#">
-                  Process
-                </a>
-                <a className="hover:text-black transition-colors" href="#">
-                  About
-                </a>
-              </div>
-              <div className="flex flex-col gap-2.5">
-                <a className="text-black underline font-semibold" href="#">
-                  Contact
-                </a>
+
+            {/* Right Column Featured Cluster */}
+            <div className="lg:col-span-7">
+              <div className="group cursor-pointer h-full">
+                <div className="bg-[#ffdcc3] rounded-3xl p-8 md:p-16 relative overflow-hidden h-full flex flex-col justify-between border border-transparent hover:border-[#ffa454]/30 transition-all">
+                  <div className="z-10">
+                    <div className="flex items-center gap-4 text-[#904d00] mb-12">
+                      <ArrowRight className="w-8 h-8 shrink-0 group-hover:translate-x-1.5 transition-transform" />
+                      <h3 className="text-[24px] md:text-[32px] font-bold tracking-tight leading-tight">
+                        Marketplace consolidation contributed to 4x revenue
+                      </h3>
+                    </div>
+                    <span className="text-[12px] font-bold text-[#904d00] uppercase tracking-widest bg-[#2f1500]/5 px-4 py-2 rounded-full">
+                      PETS4HOMES
+                    </span>
+                  </div>
+
+                  <div className="relative mt-16 md:mt-12 flex justify-center">
+                    <div className="w-full max-w-sm h-64 bg-amber-600/10 rounded-2xl border border-amber-600/20 shadow-inner flex items-center justify-center text-amber-900/40 text-sm font-mono p-4 text-center">
+                      Marketplace Mobile Application Integration Mockup
+                    </div>
+                  </div>
+
+                  {/* Floating Context Card Inside */}
+                  <div className="absolute bottom-8 right-8 w-64 bg-white/50 backdrop-blur-xl p-5 rounded-2xl border border-white/30 hidden xl:block shadow-sm">
+                    <div className="flex items-center gap-2 mb-2 text-[#3300a3] font-bold text-[14px]">
+                      <ArrowRight className="w-4 h-4" />
+                      <span>AI Processing</span>
+                    </div>
+                    <p className="text-[12px] text-[#484456] leading-relaxed">
+                      Pension Lab slashed document processing time by 95% with
+                      an AI app
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="text-xs text-[#444748] opacity-70">
-              &copy; 2026 Progress Dev. All rights reserved.
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Badges Extra Section */}
+      <section
+        id="expertise"
+        className="py-12 px-6 md:px-20 bg-[#fcf9f8] opacity-75"
+      >
+        <div className="max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-6 rounded-2xl border border-[#c9c3d9] border-dashed flex items-start gap-4">
+            <div className="p-3 bg-[#3300a3]/5 rounded-xl text-[#3300a3]">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="text-[16px] font-bold text-[#1c1b1b]">
+                Secure Enterprise Operations
+              </h4>
+              <p className="text-[14px] text-[#484456] mt-1">
+                Full NDA compliance, secure access parameters, and encrypted
+                source structures.
+              </p>
+            </div>
+          </div>
+          <div className="p-6 rounded-2xl border border-[#c9c3d9] border-dashed flex items-start gap-4">
+            <div className="p-3 bg-[#3300a3]/5 rounded-xl text-[#3300a3]">
+              <Network className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="text-[16px] font-bold text-[#1c1b1b]">
+                Native Pipeline Integration
+              </h4>
+              <p className="text-[14px] text-[#484456] mt-1">
+                Direct sync with internal architectures, GitHub deployment
+                tracks, and tracking platforms.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-[#f0eded] border-t border-[#c9c3d9]/50 w-full py-16">
+        <div className="max-w-[1280px] mx-auto px-6 md:px-20 flex flex-col sm:flex-row justify-between items-center gap-8">
+          <div className="text-[24px] font-bold text-[#1c1b1b]">
+            DevProgress
+          </div>
+          <div className="flex flex-col sm:flex-row gap-6 items-center text-[14px]">
+            <div className="flex gap-6">
+              <a
+                className="text-[#484456] hover:text-[#3300a3] transition-colors"
+                href="#"
+              >
+                Privacy Policy
+              </a>
+              <a
+                className="text-[#484456] hover:text-[#3300a3] transition-colors"
+                href="#"
+              >
+                Terms of Service
+              </a>
+              <a
+                className="text-[#484456] hover:text-[#3300a3] transition-colors"
+                href="#"
+              >
+                Contact
+              </a>
+            </div>
+            <div className="text-[#484456] font-medium sm:border-l sm:border-[#c9c3d9] sm:pl-6">
+              © {new Date().getFullYear()} DevProgress. All rights reserved.
             </div>
           </div>
         </div>

@@ -1,0 +1,41 @@
+// ==========================================
+// TABEL BARU: SKALA / BOBOT NILAI
+// ==========================================
+model SkalaNilai {
+  id           Int      @id @default(autoincrement())
+  nilaiHuruf   String   @unique @map("nilai_huruf") @db.VarChar(2) // Contoh: 'A', 'B+', 'C'
+  bobotIndeks  Decimal  @map("bobot_indeks") @db.Decimal(3, 2)     // Contoh: 4.00, 3.50, 2.00
+  nilaiMinimal Decimal  @map("nilai_minimal") @db.Decimal(5, 2)    // Contoh: 85.00 (Batas bawah untuk dapet A)
+  nilaiMaksimal Decimal @map("nilai_maksimal") @db.Decimal(5, 2)   // Contoh: 100.00
+  keterangan   String?  @db.VarChar(50)                            // Contoh: "Sangat Baik", "Cukup"
+
+  // Relations
+  khs          Khs[]
+
+  @@map("skala_nilai")
+}
+
+// ==========================================
+// MODIFIKASI TABEL KHS (Menghubungkan ke SkalaNilai)
+// ==========================================
+model Khs {
+  id            Int          @id @default(autoincrement())
+  nim           String
+  jadwalId      Int          @map("jadwal_id")
+  nilaiTugas    Decimal?     @map("nilai_tugas") @db.Decimal(5, 2)
+  nilaiUts      Decimal?     @map("nilai_uts") @db.Decimal(5, 2)
+  nilaiUas      Decimal?     @map("nilai_uas") @db.Decimal(5, 2)
+  nilaiPresensi Decimal?     @map("nilai_presensi") @db.Decimal(5, 2)
+  nilaiAngka    Decimal?     @map("nilai_angka") @db.Decimal(5, 2)
+  
+  // Mengubah field ini menjadi Foreign Key yang merujuk ke SkalaNilai
+  nilaiHurufId  String?      @map("nilai_huruf_id")
+
+  // Relations
+  mahasiswa     Mahasiswa    @relation(fields: [nim], references: [nim], onDelete: Cascade)
+  jadwal        JadwalKuliah @relation(fields: [jadwalId], references: [id], onDelete: Cascade)
+  skalaNilai    SkalaNilai?  @relation(fields: [nilaiHurufId], references: [nilaiHuruf], onDelete: SetNull)
+
+  @@unique([nim, jadwalId])
+  @@map("khs")
+}

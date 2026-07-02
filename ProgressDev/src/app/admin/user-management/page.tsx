@@ -29,140 +29,30 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-// --- Types ---
-interface User {
-  id: number;
-  name: string;
-  initials: string;
-  email: string;
-  role: "Admin" | "Developer" | "Stakeholder";
-  status: "Active" | "Inactive";
-  image?: string;
-}
-
-// --- Mock Data ---
-const USERS: User[] = [
-  {
-    id: 1,
-    name: "Julian Sterling",
-    initials: "JS",
-    email: "j.sterling@devprogress.io",
-    role: "Admin",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Elena Rodriguez",
-    initials: "ER",
-    email: "e.rodriguez@devprogress.io",
-    role: "Developer",
-    status: "Active",
-    image:
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=100&auto=format&fit=crop",
-  },
-  {
-    id: 3,
-    name: "Marcus Bennet",
-    initials: "MB",
-    email: "m.bennet@external.com",
-    role: "Stakeholder",
-    status: "Inactive",
-  },
-  {
-    id: 4,
-    name: "Sarah Higgins",
-    initials: "SH",
-    email: "s.higgins@devprogress.io",
-    role: "Developer",
-    status: "Active",
-  },
-];
+import { usersApi, ApiProfile } from "@/lib/api";
 
 export default function UserManagementPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [users, setUsers] = useState<ApiProfile[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
+    usersApi.getAll()
+      .then((data) => {
+        setUsers(data);
+        setIsLoading(false);
+      })
+      .catch(console.error);
+  }, []);
+
+  const admins = users.filter((u) => u.role === "admin").length;
+  const developers = users.filter((u) => u.role === "developer").length;
+  const stakeholders = users.filter((u) => u.role === "stakeholder").length;
 
   return (
     <div className="flex min-h-screen bg-[#f8f9ff] font-sans text-[#0b1c30]">
-      {/* Sidebar Navigation */}
-      <aside className="fixed left-0 top-0 h-full w-[280px] bg-[#eff4ff] border-r border-[#c5c6cd] flex flex-col py-6 px-4 z-50">
-        <div className="flex items-center gap-4 px-2 mb-8">
-          <div className="w-10 h-10 rounded-lg bg-[#1e293b] flex items-center justify-center">
-            <Terminal size={20} className="text-white" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-[#091426]">DevProgress</h2>
-            <p className="text-xs uppercase tracking-wider text-[#45474c] opacity-70 font-semibold">
-              Technical Execution
-            </p>
-          </div>
-        </div>
-
-        <nav className="flex-1 flex flex-col gap-1">
-          <SidebarLink
-            icon={<Users size={20} />}
-            label="User Management"
-            active
-          />
-          <SidebarLink
-            icon={<LayoutDashboard size={20} />}
-            label="Global Overview"
-          />
-          <SidebarLink icon={<Kanban size={20} />} label="Kanban Board" />
-          <SidebarLink icon={<Flag size={20} />} label="Stakeholder View" />
-        </nav>
-
-        <div className="mt-auto pt-6 border-t border-[#c5c6cd] flex flex-col gap-1">
-          <button className="bg-[#0058be] text-white py-3 px-4 rounded-lg font-bold flex items-center justify-center gap-2 mb-4 hover:brightness-110 transition-all shadow-md">
-            <Plus size={18} />
-            <span>Create Project</span>
-          </button>
-          <SidebarLink icon={<Settings size={20} />} label="Settings" />
-          <SidebarLink icon={<LogOut size={20} />} label="Logout" danger />
-        </div>
-      </aside>
-
       {/* Main Content Area */}
-      <main className="ml-[280px] flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-white border-b border-[#c5c6cd] flex justify-between items-center px-6 h-16 sticky top-0 z-40">
-          <div className="relative">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#75777d]"
-              size={18}
-            />
-            <input
-              type="text"
-              placeholder="Search resources..."
-              className="bg-[#f0f4f8] border-none rounded-lg py-2 pl-10 pr-4 w-64 text-sm focus:ring-2 focus:ring-[#0058be] transition-all outline-none"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center gap-4">
-            <HeaderIconButton icon={<Bell size={20} />} />
-            <HeaderIconButton icon={<HelpCircle size={20} />} />
-            <div className="h-8 w-px bg-[#c5c6cd] mx-2" />
-            <div className="flex items-center gap-3">
-              <div className="text-right hidden md:block">
-                <p className="text-sm font-bold text-[#091426]">
-                  Admin Account
-                </p>
-                <p className="text-[10px] uppercase tracking-wider text-[#75777d] font-bold">
-                  System Lead
-                </p>
-              </div>
-              <div className="w-10 h-10 rounded-full border border-[#c5c6cd] overflow-hidden relative bg-gray-200">
-                <Image
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop"
-                  alt="Admin Profile"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </div>
-          </div>
-        </header>
-
+      <main className="flex-1 flex flex-col">
         {/* Canvas Area */}
         <div className="p-8 max-w-7xl mx-auto w-full">
           {/* Page Title */}
@@ -191,12 +81,12 @@ export default function UserManagementPage() {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <StatCard label="Total Users" value="1,284" trend="+12%" />
-            <StatCard label="Active Now" value="342" activePulse />
-            <StatCard label="Admins" value="12" icon={<Shield size={20} />} />
+            <StatCard label="Total Users" value={users.length.toString()} trend="+2" />
+            <StatCard label="Developers" value={developers.toString()} activePulse />
+            <StatCard label="Admins" value={admins.toString()} icon={<Shield size={20} />} />
             <StatCard
-              label="Pending Invites"
-              value="08"
+              label="Stakeholders"
+              value={stakeholders.toString()}
               icon={<Mail size={20} />}
             />
           </div>
@@ -217,7 +107,7 @@ export default function UserManagementPage() {
                 </button>
               </div>
               <span className="text-xs text-[#75777d] font-medium uppercase tracking-wider">
-                Displaying 1-10 of 1,284 users
+                Displaying {users.length} users
               </span>
             </div>
 
@@ -233,31 +123,24 @@ export default function UserManagementPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#c5c6cd]">
-                  {USERS.map((user) => (
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={5} className="text-center py-8 text-[#75777d]">Loading users...</td>
+                    </tr>
+                  ) : users.map((user) => (
                     <tr
                       key={user.id}
                       className="hover:bg-[#f8f9ff] transition-colors group"
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          {user.image ? (
-                            <div className="w-8 h-8 rounded-full overflow-hidden relative border border-gray-200">
-                              <Image
-                                src={user.image}
-                                alt={user.name}
-                                fill
-                                className="object-cover"
-                              />
-                            </div>
-                          ) : (
-                            <div
-                              className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[10px] text-white ${user.role === "Admin" ? "bg-[#091426]" : "bg-[#2f2ebe]"}`}
-                            >
-                              {user.initials}
-                            </div>
-                          )}
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[10px] text-white ${user.role === "admin" ? "bg-[#091426]" : "bg-[#2f2ebe]"}`}
+                          >
+                            {(user.displayName || user.email).substring(0, 2).toUpperCase()}
+                          </div>
                           <span className="font-semibold text-[#091426]">
-                            {user.name}
+                            {user.displayName || "No Name"}
                           </span>
                         </div>
                       </td>
@@ -271,12 +154,12 @@ export default function UserManagementPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div
-                          className={`flex items-center gap-1.5 text-sm font-semibold ${user.status === "Active" ? "text-emerald-600" : "text-[#75777d]"}`}
+                          className={`flex items-center gap-1.5 text-sm font-semibold text-emerald-600`}
                         >
                           <div
-                            className={`w-1.5 h-1.5 rounded-full ${user.status === "Active" ? "bg-emerald-500" : "bg-[#75777d]"}`}
+                            className={`w-1.5 h-1.5 rounded-full bg-emerald-500`}
                           />
-                          {user.status}
+                          Active
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -301,19 +184,8 @@ export default function UserManagementPage() {
                 <ChevronLeft size={16} /> Previous
               </button>
               <div className="flex gap-1">
-                {[1, 2, 3].map((n) => (
-                  <button
-                    key={n}
-                    className={`w-8 h-8 rounded text-sm font-bold transition-colors ${n === 1 ? "bg-[#0058be] text-white" : "hover:bg-white text-[#45474c]"}`}
-                  >
-                    {n}
-                  </button>
-                ))}
-                <span className="w-8 h-8 flex items-center justify-center text-[#75777d]">
-                  ...
-                </span>
-                <button className="w-8 h-8 rounded hover:bg-white text-sm font-bold transition-colors">
-                  128
+                <button className="w-8 h-8 rounded text-sm font-bold transition-colors bg-[#0058be] text-white">
+                  1
                 </button>
               </div>
               <button className="flex items-center gap-1 px-4 py-2 rounded-lg border border-[#c5c6cd] text-sm font-semibold text-[#45474c] hover:bg-white transition-colors">
@@ -371,44 +243,7 @@ export default function UserManagementPage() {
   );
 }
 
-// --- Sub-components ---
 
-function SidebarLink({
-  icon,
-  label,
-  active = false,
-  danger = false,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  active?: boolean;
-  danger?: boolean;
-}) {
-  const baseClasses =
-    "flex items-center gap-4 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-150 ease-in-out";
-  const activeClasses = "bg-[#0058be] text-white shadow-md";
-  const inactiveClasses =
-    "text-[#45474c] hover:bg-[#d3e4fe] hover:text-[#091426]";
-  const dangerClasses = "text-red-600 hover:bg-red-50";
-
-  return (
-    <a
-      href="#"
-      className={`${baseClasses} ${active ? activeClasses : danger ? dangerClasses : inactiveClasses}`}
-    >
-      {icon}
-      <span>{label}</span>
-    </a>
-  );
-}
-
-function HeaderIconButton({ icon }: { icon: React.ReactNode }) {
-  return (
-    <button className="w-10 h-10 flex items-center justify-center rounded-full text-[#45474c] hover:bg-[#f0f4f8] transition-colors">
-      {icon}
-    </button>
-  );
-}
 
 function StatCard({
   label,
@@ -462,16 +297,16 @@ function TableTh({
   );
 }
 
-function RoleBadge({ role }: { role: User["role"] }) {
-  const colors = {
-    Admin: "bg-[#0058be]/10 text-[#0058be]",
-    Developer: "bg-[#f0f4f8] text-[#45474c]",
-    Stakeholder: "bg-[#2f2ebe]/10 text-[#2f2ebe]",
+function RoleBadge({ role }: { role: string }) {
+  const colors: Record<string, string> = {
+    admin: "bg-[#0058be]/10 text-[#0058be]",
+    developer: "bg-[#f0f4f8] text-[#45474c]",
+    stakeholder: "bg-[#2f2ebe]/10 text-[#2f2ebe]",
   };
 
   return (
     <span
-      className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${colors[role]}`}
+      className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${colors[role] || colors.developer}`}
     >
       {role}
     </span>

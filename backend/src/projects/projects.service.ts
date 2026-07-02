@@ -1,18 +1,26 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateProjectDto, UpdateProjectDto } from './dto/project.dto';
+import { CreateProjectDto, UpdateProjectDto, CreateBriefDto } from './dto/project.dto';
 
 @Injectable()
 export class ProjectsService {
   constructor(private prisma: PrismaService) {}
 
   async create(userId: string, createProjectDto: CreateProjectDto) {
+    const { teamMembers, ...rest } = createProjectDto;
+    
     return this.prisma.project.create({
       data: {
-        ...createProjectDto,
+        ...rest,
         userId,
         durationStart: new Date(createProjectDto.durationStart),
         durationEnd: new Date(createProjectDto.durationEnd),
+        teamMembers: {
+          create: teamMembers?.map(t => ({
+            profileId: t.profileId,
+            role: t.role,
+          })) || [],
+        }
       },
     });
   }
@@ -29,7 +37,11 @@ export class ProjectsService {
   async findOne(id: string, userId: string, role: string) {
     const project = await this.prisma.project.findUnique({
       where: { id },
-      include: { tasks: { include: { checklists: true } } }
+      include: { 
+        tasks: { include: { checklists: true } },
+        teamMembers: { include: { profile: true } },
+        briefs: { orderBy: { createdAt: 'desc' } }
+      }
     });
     
     if (!project) throw new NotFoundException('Project not found');
@@ -82,5 +94,20 @@ export class ProjectsService {
     if (project.userId !== userId) throw new ForbiddenException('Access denied');
 
     return this.prisma.project.delete({ where: { id } });
+  }
+
+  async createBrief(projectId: string, dto: CreateBriefDto) {
+    const project = await this.prisma.project.findUnique({ where: { id: projectId } });
+    if (!project) throw new NotFoundException('Project not found');
+
+    return this.prisma.projectBrief.create({
+      data: {
+        projectId,
+        type: dto.type,
+        preferredDate: new Date(dto.preferredDate),
+        preferredTime: dto.preferredTime,
+        objectives: dto.objectives,
+      }
+    });
   }
 }

@@ -27,93 +27,34 @@ import {
 import { motion } from "framer-motion";
 import { Stick } from "next/font/google";
 
-// --- Data Mocking ---
-const PROJECTS = [
-  {
-    id: 1,
-    name: "Cloud Infrastructure Migration",
-    type: "Infrastructure",
-    priority: "High",
-    health: "On Track",
-    progress: 68,
-    deadline: "Oct 24, 2023",
-    members: 4,
-  },
-  {
-    id: 2,
-    name: "Mobile App Redesign",
-    type: "UX/UI",
-    priority: "Medium",
-    health: "At Risk",
-    progress: 42,
-    deadline: "Nov 12, 2023",
-    members: 5,
-  },
-  {
-    id: 3,
-    name: "API Gateway V2",
-    type: "Backend",
-    priority: "High",
-    health: "Delayed",
-    progress: 15,
-    deadline: "Dec 01, 2023",
-    members: 1,
-  },
-  {
-    id: 4,
-    name: "Auth Provider Integration",
-    type: "Security",
-    priority: "Low",
-    health: "On Track",
-    progress: 92,
-    deadline: "Oct 15, 2023",
-    members: 1,
-  },
-];
+import { projectsApi, ApiProject } from "@/lib/api";
 
 export default function GlobalOverview() {
+  const [projects, setProjects] = React.useState<ApiProject[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    projectsApi.getAll()
+      .then(data => {
+        setProjects(data);
+        setIsLoading(false);
+      })
+      .catch(console.error);
+  }, []);
+
+  const totalProjects = projects.length;
+  const completedProjects = projects.filter(p => p.status === "completed").length;
+  const onTrackProjects = projects.filter(p => p.status === "active").length;
+  const delayedProjects = projects.filter(p => {
+    const end = new Date(p.durationEnd).getTime();
+    const now = new Date().getTime();
+    return p.status === "active" && end < now;
+  }).length;
+
   return (
     <div className="flex min-h-screen bg-[#f8f9ff] text-[#0b1c30] font-sans">
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col">
-        {/* TopAppBar Component [cite: 4] */}
-        <header className="h-16 bg-white border-b border-[#c5c6cd] flex justify-between items-center px-8 sticky top-0 z-40">
-          <div className="relative w-full max-w-xl">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#45474c]"
-              size={18}
-            />
-            <input
-              className="w-full bg-[#f0f4ff] border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-[#0058be] transition-all outline-none"
-              placeholder="Search projects, tasks, or members..."
-              type="text"
-            />
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button className="w-10 h-10 flex items-center justify-center text-[#45474c] hover:bg-[#eff4ff] transition-colors rounded-full relative">
-              <Bell size={20} />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#ba1a1a] rounded-full border-2 border-white"></span>
-            </button>
-            <div className="h-8 w-px bg-[#c5c6cd]" />
-            <div className="flex items-center gap-3 pl-2">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-[#091426]">Alex Rivera</p>
-                <p className="text-[11px] font-bold text-[#75777d] uppercase tracking-wider">
-                  System Admin
-                </p>
-              </div>
-              <div className="w-10 h-10 rounded-full border border-[#c5c6cd] overflow-hidden relative">
-                <Image
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop"
-                  alt="Profile"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </div>
-          </div>
-        </header>
 
         {/* Content Canvas */}
         <div className="p-8">
@@ -135,27 +76,27 @@ export default function GlobalOverview() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
             <MetricCard
               label="Total Projects"
-              value="42"
-              subValue="+3 this month"
+              value={totalProjects.toString()}
+              subValue="Active & Completed"
               icon={<ShelvingUnit className="text-[#0058be]" />}
             />
             <MetricCard
               label="On Track"
-              value="31"
-              subValue="74% Total"
+              value={onTrackProjects.toString()}
+              subValue="Active"
               icon={<CheckCircle className="text-green-600" />}
             />
             <MetricCard
               label="Delayed"
-              value="6"
+              value={delayedProjects.toString()}
               subValue="Requires Attention"
               icon={<CircleAlert className="text-[#ba1a1a]" />}
-              isError
+              isError={delayedProjects > 0}
             />
             <MetricCard
               label="Completed"
-              value="5"
-              subValue="Q3 Milestone"
+              value={completedProjects.toString()}
+              subValue="Done"
               icon={<StickyNote className="text-[#040057]" />}
             />
           </div>
@@ -190,7 +131,14 @@ export default function GlobalOverview() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#c5c6cd]">
-                  {PROJECTS.map((proj) => (
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-8 text-[#75777d]">Loading projects...</td>
+                    </tr>
+                  ) : projects.map((proj) => {
+                    const health = proj.status === "completed" ? "Completed" : proj.status === "draft" ? "Draft" : new Date(proj.durationEnd).getTime() < new Date().getTime() ? "Delayed" : "On Track";
+                    const membersCount = proj.teamMembers?.length || 0;
+                    return (
                     <tr
                       key={proj.id}
                       className="hover:bg-[#f8f9ff] transition-colors group"
@@ -198,33 +146,29 @@ export default function GlobalOverview() {
                       <td className="px-6 py-5">
                         <div className="flex flex-col">
                           <span className="text-sm font-bold text-[#091426]">
-                            {proj.name}
+                            {proj.platformName}
                           </span>
                           <span className="text-[12px] text-[#45474c]">
-                            {proj.type} • {proj.priority} Priority
+                            Budget: ${proj.budget}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-5">
-                        <HealthBadge status={proj.health} />
+                        <HealthBadge status={health} />
                       </td>
                       <td className="px-6 py-5">
                         <div className="flex -space-x-2">
-                          {[...Array(Math.min(proj.members, 3))].map((_, i) => (
+                          {[...Array(Math.min(membersCount, 3))].map((_, i) => (
                             <div
                               key={i}
-                              className="w-8 h-8 rounded-full border-2 border-white bg-gray-200 relative overflow-hidden"
+                              className="w-8 h-8 rounded-full border-2 border-white bg-gray-200 relative overflow-hidden flex items-center justify-center text-[10px] font-bold"
                             >
-                              <Image
-                                src={`https://i.pravatar.cc/100?img=${proj.id + i + 10}`}
-                                alt="Member"
-                                fill
-                              />
+                              {proj.teamMembers?.[i]?.profile?.displayName?.substring(0, 2).toUpperCase() || "MB"}
                             </div>
                           ))}
-                          {proj.members > 3 && (
+                          {membersCount > 3 && (
                             <div className="w-8 h-8 rounded-full border-2 border-white bg-[#e5eeff] flex items-center justify-center text-[10px] font-bold text-[#45474c]">
-                              +{proj.members - 3}
+                              +{membersCount - 3}
                             </div>
                           )}
                         </div>
@@ -232,18 +176,18 @@ export default function GlobalOverview() {
                       <td className="px-6 py-5 w-48">
                         <div className="flex flex-col gap-1.5">
                           <span className="text-[11px] font-bold text-[#45474c]">
-                            {proj.progress}%
+                            {proj.progress || 0}%
                           </span>
                           <div className="w-full h-1.5 bg-[#e5eeff] rounded-full overflow-hidden">
                             <div
-                              className={`h-full rounded-full ${proj.health === "Delayed" ? "bg-[#ba1a1a]" : proj.health === "At Risk" ? "bg-orange-500" : "bg-[#0058be]"}`}
-                              style={{ width: `${proj.progress}%` }}
+                              className={`h-full rounded-full ${health === "Delayed" ? "bg-[#ba1a1a]" : "bg-[#0058be]"}`}
+                              style={{ width: `${proj.progress || 0}%` }}
                             />
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-5 text-sm text-[#45474c]">
-                        {proj.deadline}
+                        {new Date(proj.durationEnd).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-5 text-right">
                         <button className="p-1.5 hover:bg-[#e5eeff] rounded-lg transition-all text-[#45474c]">
@@ -251,14 +195,14 @@ export default function GlobalOverview() {
                         </button>
                       </td>
                     </tr>
-                  ))}
+                  )})}
                 </tbody>
               </table>
             </div>
 
             <div className="px-6 py-4 border-t border-[#c5c6cd] flex justify-between items-center bg-[#f8f9ff]">
               <span className="text-xs font-medium text-[#45474c]">
-                Showing 1-10 of 42 projects
+                Showing {projects.length} projects
               </span>
               <div className="flex items-center gap-2">
                 <button
@@ -292,23 +236,7 @@ export default function GlobalOverview() {
 
 // --- Sub-components ---
 
-const SidebarLink = ({
-  icon,
-  label,
-  active = false,
-}: {
-  icon: any;
-  label: string;
-  active?: boolean;
-}) => (
-  <a
-    href="#"
-    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${active ? "bg-[#d3e4fe] text-[#0058be] font-bold" : "text-[#45474c] hover:bg-[#e5eeff]"}`}
-  >
-    {icon}
-    <span className="text-sm">{label}</span>
-  </a>
-);
+
 
 const MetricCard = ({
   label,
@@ -367,12 +295,14 @@ const TableActionBtn = ({ icon, label }: { icon: any; label: string }) => (
 const HealthBadge = ({ status }: { status: string }) => {
   const styles: any = {
     "On Track": "bg-green-50 text-green-700",
-    "At Risk": "bg-orange-50 text-orange-700",
+    "Completed": "bg-blue-50 text-blue-700",
+    "Draft": "bg-gray-50 text-gray-700",
     Delayed: "bg-[#ffdad6] text-[#93000a]",
   };
   const dots: any = {
     "On Track": "bg-green-600",
-    "At Risk": "bg-orange-500",
+    "Completed": "bg-blue-600",
+    "Draft": "bg-gray-600",
     Delayed: "bg-[#ba1a1a]",
   };
 
