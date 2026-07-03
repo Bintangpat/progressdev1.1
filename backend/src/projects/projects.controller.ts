@@ -67,7 +67,7 @@ export class ProjectsController {
     @Body() updateProjectDto: UpdateProjectDto,
     @CurrentUser() user: any,
   ) {
-    return this.projectsService.update(id, updateProjectDto, user.id);
+    return this.projectsService.update(id, updateProjectDto, user.id, user.role);
   }
 
   @Delete(':id')
@@ -76,7 +76,7 @@ export class ProjectsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete project' })
   remove(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.projectsService.remove(id, user.id);
+    return this.projectsService.remove(id, user.id, user.role);
   }
 
   @Post(':id/briefs')

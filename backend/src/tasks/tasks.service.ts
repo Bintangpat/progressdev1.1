@@ -27,11 +27,18 @@ export class TasksService {
   ) {
     const task = await this.prisma.task.findUnique({
       where: { id: taskId },
-      include: { project: true },
+      include: { project: { include: { teamMembers: true } } },
     });
     if (!task) throw new NotFoundException('Task not found');
-    if (role !== 'admin' && task.project.userId !== userId)
-      throw new ForbiddenException('Access denied');
+    
+    if (role !== 'admin') {
+      const isTeamMember = task.project.teamMembers.some(
+        (t) => t.profileId === userId,
+      );
+      if (!isTeamMember && task.project.userId !== userId) {
+        throw new ForbiddenException('Access denied');
+      }
+    }
 
     const publicUrl = await this.storageService.uploadScreenshot(
       file,
@@ -48,13 +55,20 @@ export class TasksService {
   }
 
   async create(createTaskDto: CreateTaskDto, userId: string, role: string) {
-    // Validate project ownership if not admin
     const project = await this.prisma.project.findUnique({
       where: { id: createTaskDto.projectId },
+      include: { teamMembers: true },
     });
     if (!project) throw new NotFoundException('Project not found');
-    if (role !== 'admin' && project.userId !== userId)
-      throw new ForbiddenException('Access denied to this project');
+    
+    if (role !== 'admin') {
+      const isTeamMember = project.teamMembers.some(
+        (t) => t.profileId === userId,
+      );
+      if (!isTeamMember && project.userId !== userId) {
+        throw new ForbiddenException('Access denied to this project');
+      }
+    }
 
     return this.prisma.task.create({
       data: createTaskDto,
@@ -69,11 +83,18 @@ export class TasksService {
   ) {
     const task = await this.prisma.task.findUnique({
       where: { id },
-      include: { project: true },
+      include: { project: { include: { teamMembers: true } } },
     });
     if (!task) throw new NotFoundException('Task not found');
-    if (role !== 'admin' && task.project.userId !== userId)
-      throw new ForbiddenException('Access denied');
+    
+    if (role !== 'admin') {
+      const isTeamMember = task.project.teamMembers.some(
+        (t) => t.profileId === userId,
+      );
+      if (!isTeamMember && task.project.userId !== userId) {
+        throw new ForbiddenException('Access denied');
+      }
+    }
 
     return this.prisma.task.update({
       where: { id },
@@ -89,11 +110,18 @@ export class TasksService {
   ) {
     const task = await this.prisma.task.findUnique({
       where: { id: taskId },
-      include: { project: true },
+      include: { project: { include: { teamMembers: true } } },
     });
     if (!task) throw new NotFoundException('Task not found');
-    if (role !== 'admin' && task.project.userId !== userId)
-      throw new ForbiddenException('Access denied');
+    
+    if (role !== 'admin') {
+      const isTeamMember = task.project.teamMembers.some(
+        (t) => t.profileId === userId,
+      );
+      if (!isTeamMember && task.project.userId !== userId) {
+        throw new ForbiddenException('Access denied');
+      }
+    }
 
     return this.prisma.checklistItem.create({
       data: {
@@ -111,11 +139,18 @@ export class TasksService {
   ) {
     const checklist = await this.prisma.checklistItem.findUnique({
       where: { id: checklistId },
-      include: { task: { include: { project: true } } },
+      include: { task: { include: { project: { include: { teamMembers: true } } } } },
     });
     if (!checklist) throw new NotFoundException('Checklist not found');
-    if (role !== 'admin' && checklist.task.project.userId !== userId)
-      throw new ForbiddenException('Access denied');
+    
+    if (role !== 'admin') {
+      const isTeamMember = checklist.task.project.teamMembers.some(
+        (t) => t.profileId === userId,
+      );
+      if (!isTeamMember && checklist.task.project.userId !== userId) {
+        throw new ForbiddenException('Access denied');
+      }
+    }
 
     return this.prisma.checklistItem.update({
       where: { id: checklistId },
@@ -126,11 +161,18 @@ export class TasksService {
   async removeTask(id: string, userId: string, role: string) {
     const task = await this.prisma.task.findUnique({
       where: { id },
-      include: { project: true },
+      include: { project: { include: { teamMembers: true } } },
     });
     if (!task) throw new NotFoundException('Task not found');
-    if (role !== 'admin' && task.project.userId !== userId)
-      throw new ForbiddenException('Access denied');
+    
+    if (role !== 'admin') {
+      const isTeamMember = task.project.teamMembers.some(
+        (t) => t.profileId === userId,
+      );
+      if (!isTeamMember && task.project.userId !== userId) {
+        throw new ForbiddenException('Access denied');
+      }
+    }
 
     return this.prisma.task.delete({ where: { id } });
   }
@@ -138,11 +180,18 @@ export class TasksService {
   async removeChecklist(id: string, userId: string, role: string) {
     const checklist = await this.prisma.checklistItem.findUnique({
       where: { id },
-      include: { task: { include: { project: true } } },
+      include: { task: { include: { project: { include: { teamMembers: true } } } } },
     });
     if (!checklist) throw new NotFoundException('Checklist not found');
-    if (role !== 'admin' && checklist.task.project.userId !== userId)
-      throw new ForbiddenException('Access denied');
+    
+    if (role !== 'admin') {
+      const isTeamMember = checklist.task.project.teamMembers.some(
+        (t) => t.profileId === userId,
+      );
+      if (!isTeamMember && checklist.task.project.userId !== userId) {
+        throw new ForbiddenException('Access denied');
+      }
+    }
 
     return this.prisma.checklistItem.delete({ where: { id } });
   }

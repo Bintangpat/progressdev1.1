@@ -144,10 +144,10 @@ export class ProjectsService {
     return { ...project, progress };
   }
 
-  async update(id: string, updateProjectDto: UpdateProjectDto, userId: string) {
+  async update(id: string, updateProjectDto: UpdateProjectDto, userId: string, role: string) {
     const project = await this.prisma.project.findUnique({ where: { id } });
     if (!project) throw new NotFoundException('Project not found');
-    if (project.userId !== userId)
+    if (role !== 'admin' && project.userId !== userId)
       throw new ForbiddenException('Access denied');
 
     const data: any = { ...updateProjectDto };
@@ -160,10 +160,10 @@ export class ProjectsService {
     });
   }
 
-  async remove(id: string, userId: string) {
+  async remove(id: string, userId: string, role: string) {
     const project = await this.prisma.project.findUnique({ where: { id } });
     if (!project) throw new NotFoundException('Project not found');
-    if (project.userId !== userId)
+    if (role !== 'admin' && project.userId !== userId)
       throw new ForbiddenException('Access denied');
 
     return this.prisma.project.delete({ where: { id } });
