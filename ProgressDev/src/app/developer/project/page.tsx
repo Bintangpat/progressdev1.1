@@ -1,11 +1,14 @@
-aaaaaaaa"use client";
+"use client";
 
 import React from "react";
 import { motion } from "framer-motion";
 import { Folder, Search } from "lucide-react";
 import { ProgressCard } from "@/components/developer/overview/progress-card";
 import { MetricCards } from "@/components/developer/overview/metric-cards";
-import { ActivityFeed, ActivityItem } from "@/components/developer/overview/activity-feed";
+import {
+  ActivityFeed,
+  ActivityItem,
+} from "@/components/developer/overview/activity-feed";
 
 const RECENT_ACTIVITIES: ActivityItem[] = [
   {
@@ -102,10 +105,19 @@ export default function ProjectOverview() {
             className="grid grid-cols-1 lg:grid-cols-3 gap-6"
           >
             {/* Phase 2: Modular ProgressCard */}
-            <ProgressCard progress={75} sprintName="Sprint 4 Development Timeline" statusText="ON TRACK" />
+            <ProgressCard
+              progress={75}
+              sprintName="Sprint 4 Development Timeline"
+              statusText="ON TRACK"
+            />
 
             {/* Phase 2: Modular MetricCards Stack */}
-            <MetricCards totalTasks={124} completedTasks={93} teamMembers={8} weeklyIncrease={12} />
+            <MetricCards
+              totalTasks={124}
+              completedTasks={93}
+              teamMembers={8}
+              weeklyIncrease={12}
+            />
           </motion.div>
 
           {/* Phase 2: Modular Activity Timeline Logs */}
