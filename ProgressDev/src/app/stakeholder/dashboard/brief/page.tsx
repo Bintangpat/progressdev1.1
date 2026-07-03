@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Cpu,
@@ -22,8 +22,10 @@ import {
 } from "lucide-react";
 
 import { useParams, useRouter } from "next/navigation";
-import { projectsApi, briefsApi } from "@/lib/api";
-import { useEffect } from "react";
+import { projectsApi, briefsApi, usersApi } from "@/lib/api";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { ParticipantSheet } from "./sheet";
 
 export default function RequestBriefing() {
   const params = useParams();
@@ -32,8 +34,10 @@ export default function RequestBriefing() {
   // State manajemen form sederhana
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [projectId, setProjectId] = useState<string>("");
+  const [developers, setDevelopers] = useState<any[]>([]);
+  const [selectedParticipants, setSelectedParticipants] = useState<any[]>([]);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     type: "Executive Summary",
@@ -49,6 +53,9 @@ export default function RequestBriefing() {
         .then((res) => setProjectId(res.id))
         .catch(console.error);
     }
+    usersApi.getByRole("developer")
+      .then(setDevelopers)
+      .catch(console.error);
   }, [params.project]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -201,37 +208,40 @@ export default function RequestBriefing() {
                     Participants & Presenters
                   </label>
                   <div className="flex flex-wrap gap-3 items-center bg-[#eff4ff]/50 p-4 rounded-lg border border-[#c5c6cd] border-dashed">
-                    {/* Suggested Person 1 */}
-                    <div className="flex items-center gap-2 bg-white border border-[#c5c6cd] p-1 pr-3 rounded-full shadow-sm hover:border-[#0058be] cursor-pointer transition-all group">
-                      <div className="w-6 h-6 rounded-full bg-amber-500 text-white font-bold text-[10px] flex items-center justify-center">
-                        SJ
-                      </div>
-                      <span className="text-[12px] font-medium text-[#0b1c30]">
-                        Sarah Jenkins (Lead)
-                      </span>
-                      <X className="w-3.5 h-3.5 text-[#75777d] group-hover:text-[#ba1a1a] transition-colors" />
-                    </div>
-
-                    {/* Suggested Person 2 */}
-                    <div className="flex items-center gap-2 bg-white border border-[#c5c6cd] p-1 pr-3 rounded-full shadow-sm hover:border-[#0058be] cursor-pointer transition-all group">
-                      <div className="w-6 h-6 rounded-full bg-purple-500 text-white font-bold text-[10px] flex items-center justify-center">
-                        MT
-                      </div>
-                      <span className="text-[12px] font-medium text-[#0b1c30]">
-                        Marcus Thorne
-                      </span>
-                      <X className="w-3.5 h-3.5 text-[#75777d] group-hover:text-[#ba1a1a] transition-colors" />
-                    </div>
+                    {selectedParticipants.map((p) => (
+                      <Badge
+                        key={p.id}
+                        variant="secondary"
+                        className="pl-1 pr-2 py-1 h-8 rounded-full bg-[#d8e2ff] text-[#001a42] flex items-center gap-1.5 border-none shadow-xs"
+                      >
+                        <Avatar className="w-6 h-6">
+                          <AvatarFallback className="text-[10px] font-bold bg-[#0058be] text-white">
+                            {p.displayName.substring(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-xs font-semibold">{p.displayName}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedParticipants(selectedParticipants.filter((s) => s.id !== p.id));
+                          }}
+                          className="hover:text-[#ba1a1a] transition-colors cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </Badge>
+                    ))}
 
                     {/* Add Button */}
                     <button
                       type="button"
-                      className="w-7 h-7 flex items-center justify-center rounded-full border border-[#0058be] border-dashed text-[#0058be] hover:bg-[#0058be] hover:text-white transition-all"
+                      onClick={() => setIsSheetOpen(true)}
+                      className="w-7 h-7 flex items-center justify-center rounded-full border border-[#0058be] border-dashed text-[#0058be] hover:bg-[#0058be] hover:text-white transition-all cursor-pointer"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
                     <span className="text-[#75777d] text-[12px] italic ml-2">
-                      Search to invite more team members...
+                      Click plus to invite team members...
                     </span>
                   </div>
                 </div>
@@ -384,6 +394,15 @@ export default function RequestBriefing() {
           </div>
         </div>
       </main>
+
+      <ParticipantSheet
+        isOpen={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+        availableParticipants={developers}
+        selectedParticipants={selectedParticipants}
+        onSelect={(p) => setSelectedParticipants([...selectedParticipants, p])}
+        onRemove={(id) => setSelectedParticipants(selectedParticipants.filter((s) => s.id !== id))}
+      />
     </div>
   );
 }

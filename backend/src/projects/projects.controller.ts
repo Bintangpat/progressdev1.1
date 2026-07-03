@@ -15,9 +15,9 @@ export class ProjectsController {
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.admin, Role.developer)
+  @Roles(Role.admin, Role.developer, Role.stakeholder)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create new project (Admin/Developer)' })
+  @ApiOperation({ summary: 'Create new project (Admin/Developer/Stakeholder)' })
   create(@Body() createProjectDto: CreateProjectDto, @CurrentUser() user: any) {
     return this.projectsService.create(user.id, createProjectDto);
   }
@@ -46,7 +46,7 @@ export class ProjectsController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.admin, Role.developer)
+  @Roles(Role.admin, Role.developer, Role.stakeholder)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update project' })
   update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto, @CurrentUser() user: any) {
@@ -55,7 +55,7 @@ export class ProjectsController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.admin, Role.developer)
+  @Roles(Role.admin, Role.developer, Role.stakeholder)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete project' })
   remove(@Param('id') id: string, @CurrentUser() user: any) {
@@ -68,5 +68,23 @@ export class ProjectsController {
   @ApiOperation({ summary: 'Create a new project brief (Stakeholder)' })
   createBrief(@Param('id') id: string, @Body() createBriefDto: CreateBriefDto) {
     return this.projectsService.createBrief(id, createBriefDto);
+  }
+
+  @Post(':id/stakeholders')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.admin)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Add additional stakeholder guest to project (Admin)' })
+  addStakeholder(@Param('id') id: string, @Body('profileId') profileId: string) {
+    return this.projectsService.addStakeholder(id, profileId);
+  }
+
+  @Delete(':id/stakeholders/:profileId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.admin)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Remove additional stakeholder guest from project (Admin)' })
+  removeStakeholder(@Param('id') id: string, @Param('profileId') profileId: string) {
+    return this.projectsService.removeStakeholder(id, profileId);
   }
 }

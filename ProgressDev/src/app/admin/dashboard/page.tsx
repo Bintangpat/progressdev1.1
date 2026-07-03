@@ -1,39 +1,24 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import {
-  Terminal,
-  Plus,
-  Users,
-  LayoutDashboard,
-  Kanban,
-  Flag,
-  Settings,
-  LogOut,
-  Search,
-  Bell,
-  HelpCircle,
   CheckCircle,
   CircleAlert,
   ShelvingUnit,
-  ArrowDownWideNarrow,
-  Download,
-  Ellipsis,
-  ChevronLeft,
-  ChevronRight,
   StickyNote,
-} from "lucide-react"; // Menggunakan Lucide sebagai standar modern Next.js [cite: 6, 12]
+  Loader2,
+} from "lucide-react";
 import { motion } from "framer-motion";
-import { Stick } from "next/font/google";
-
 import { projectsApi, ApiProject } from "@/lib/api";
+import { DataTable } from "@/components/data-table";
+import { columns } from "./columns";
 
 export default function GlobalOverview() {
   const [projects, setProjects] = React.useState<ApiProject[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
-  React.useEffect(() => {
+  const fetchProjects = () => {
+    setIsLoading(true);
     projectsApi
       .getAll()
       .then((data) => {
@@ -41,6 +26,10 @@ export default function GlobalOverview() {
         setIsLoading(false);
       })
       .catch(console.error);
+  };
+
+  React.useEffect(() => {
+    fetchProjects();
   }, []);
 
   const totalProjects = projects.length;
@@ -111,144 +100,22 @@ export default function GlobalOverview() {
           >
             <div className="px-6 py-4 border-b border-[#c5c6cd] flex justify-between items-center bg-[#f8f9ff]">
               <h3 className="font-bold text-[#091426]">Active Portfolio</h3>
-              <div className="flex gap-2">
-                <TableActionBtn
-                  icon={<ArrowDownWideNarrow size={16} />}
-                  label="Filter"
-                />
-                <TableActionBtn icon={<Download size={16} />} label="Export" />
-              </div>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-[#f0f4ff] border-b border-[#c5c6cd]">
-                    <Th>Project Name</Th>
-                    <Th>Health</Th>
-                    <Th>Stakeholder</Th>
-                    <Th>Progress</Th>
-                    <Th>Deadline</Th>
-                    <Th className="text-right">Action</Th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#c5c6cd]">
-                  {isLoading ? (
-                    <tr>
-                      <td
-                        colSpan={6}
-                        className="text-center py-8 text-[#75777d]"
-                      >
-                        Loading projects...
-                      </td>
-                    </tr>
-                  ) : (
-                    projects.map((proj) => {
-                      const health =
-                        proj.status === "completed"
-                          ? "Completed"
-                          : proj.status === "draft"
-                            ? "Draft"
-                            : new Date(proj.durationEnd).getTime() <
-                                new Date().getTime()
-                              ? "Delayed"
-                              : "On Track";
-                      const membersCount = proj.teamMembers?.length || 0;
-                      return (
-                        <tr
-                          key={proj.id}
-                          className="hover:bg-[#f8f9ff] transition-colors group"
-                        >
-                          <td className="px-6 py-5">
-                            <div className="flex flex-col">
-                              <span className="text-sm font-bold text-[#091426]">
-                                {proj.platformName}
-                              </span>
-                              <span className="text-[12px] text-foreground">
-                                Budget: ${proj.budget}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-5">
-                            <HealthBadge status={health} />
-                          </td>
-                          <td className="px-6 py-5">
-                            <div className="flex -space-x-2">
-                              {[...Array(Math.min(membersCount, 3))].map(
-                                (_, i) => (
-                                  <div
-                                    key={i}
-                                    className="w-8 h-8 rounded-full border-2 border-white bg-gray-200 relative overflow-hidden flex items-center justify-center text-[10px] font-bold"
-                                  >
-                                    {proj.teamMembers?.[i]?.profile?.displayName
-                                      ?.substring(0, 2)
-                                      .toUpperCase() || "MB"}
-                                  </div>
-                                ),
-                              )}
-                              {membersCount > 3 && (
-                                <div className="w-8 h-8 rounded-full border-2 border-white bg-[#e5eeff] flex items-center justify-center text-[10px] font-bold text-foreground">
-                                  +{membersCount - 3}
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-6 py-5 w-48">
-                            <div className="flex flex-col gap-1.5">
-                              <span className="text-[11px] font-bold text-foreground">
-                                {proj.progress || 0}%
-                              </span>
-                              <div className="w-full h-1.5 bg-[#e5eeff] rounded-full overflow-hidden">
-                                <div
-                                  className={`h-full rounded-full ${health === "Delayed" ? "bg-[#ba1a1a]" : "bg-[#0058be]"}`}
-                                  style={{ width: `${proj.progress || 0}%` }}
-                                />
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-5 text-sm text-foreground">
-                            {new Date(proj.durationEnd).toLocaleDateString()}
-                          </td>
-                          <td className="px-6 py-5 text-right">
-                            <button className="p-1.5 hover:bg-[#e5eeff] rounded-lg transition-all text-foreground">
-                              <Ellipsis size={18} />
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="px-6 py-4 border-t border-[#c5c6cd] flex justify-between items-center bg-[#f8f9ff]">
-              <span className="text-xs font-medium text-foreground">
-                Showing {projects.length} projects
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  className="p-1 rounded-lg hover:bg-[#e5eeff] disabled:opacity-30"
-                  disabled
-                >
-                  <ChevronLeft size={18} />
-                </button>
-                <div className="flex gap-1">
-                  <button className="w-8 h-8 flex items-center justify-center bg-[#0058be] text-white rounded-lg text-xs font-bold">
-                    1
-                  </button>
-                  <button className="w-8 h-8 flex items-center justify-center hover:bg-[#e5eeff] rounded-lg text-xs font-bold text-foreground">
-                    2
-                  </button>
-                  <button className="w-8 h-8 flex items-center justify-center hover:bg-[#e5eeff] rounded-lg text-xs font-bold text-foreground">
-                    3
-                  </button>
-                </div>
-                <button className="p-1 rounded-lg hover:bg-[#e5eeff]">
-                  <ChevronRight size={18} />
-                </button>
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-16 gap-3">
+                <Loader2 className="w-8 h-8 animate-spin text-[#0058be]" />
+                <span className="text-sm text-[#75777d] font-semibold">Loading portfolio...</span>
               </div>
-            </div>
+            ) : (
+              <DataTable
+                columns={columns}
+                data={projects}
+                filterColumnId="platformName"
+                filterPlaceholder="Search projects..."
+                meta={{ refresh: fetchProjects }}
+              />
+            )}
           </motion.section>
         </div>
       </main>
@@ -291,47 +158,3 @@ const MetricCard = ({
     </div>
   </motion.div>
 );
-
-const Th = ({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => (
-  <th
-    className={`px-6 py-3 text-[10px] font-bold text-[#75777d] uppercase tracking-widest ${className}`}
-  >
-    {children}
-  </th>
-);
-
-const TableActionBtn = ({ icon, label }: { icon: any; label: string }) => (
-  <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#c5c6cd] rounded-lg text-foreground text-[11px] font-bold hover:bg-white transition-all">
-    {icon} {label}
-  </button>
-);
-
-const HealthBadge = ({ status }: { status: string }) => {
-  const styles: any = {
-    "On Track": "bg-green-50 text-green-700",
-    Completed: "bg-blue-50 text-blue-700",
-    Draft: "bg-gray-50 text-gray-700",
-    Delayed: "bg-[#ffdad6] text-[#93000a]",
-  };
-  const dots: any = {
-    "On Track": "bg-green-600",
-    Completed: "bg-blue-600",
-    Draft: "bg-gray-600",
-    Delayed: "bg-[#ba1a1a]",
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${styles[status]}`}
-    >
-      <span className={`w-1.5 h-1.5 rounded-full ${dots[status]}`}></span>
-      {status}
-    </span>
-  );
-};

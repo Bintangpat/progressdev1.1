@@ -26,11 +26,36 @@ export class ProjectsService {
   }
 
   async findAllByUser(userId: string, role: string) {
+    const includeRelations = {
+      user: true,
+      briefs: { orderBy: { createdAt: 'desc' } as const },
+      tasks: { include: { checklists: true } }
+    };
+
     if (role === 'admin') {
-      return this.prisma.project.findMany({ include: { user: true } });
+      return this.prisma.project.findMany({ include: includeRelations });
     }
+    
+    if (role === 'developer') {
+      return this.prisma.project.findMany({
+        where: {
+          teamMembers: {
+            some: { profileId: userId }
+          }
+        },
+        include: includeRelations
+      });
+    }
+
+    // For stakeholders (Primary owners OR invited stakeholders)
     return this.prisma.project.findMany({
-      where: { userId },
+      where: {
+        OR: [
+          { userId },
+          { stakeholders: { some: { profileId: userId } } }
+        ]
+      },
+      include: includeRelations
     });
   }
 
@@ -40,14 +65,26 @@ export class ProjectsService {
       include: { 
         tasks: { include: { checklists: true } },
         teamMembers: { include: { profile: true } },
+        stakeholders: { include: { profile: true } },
         briefs: { orderBy: { createdAt: 'desc' } }
       }
     });
     
     if (!project) throw new NotFoundException('Project not found');
     
-    if (role !== 'admin' && project.userId !== userId) {
-      throw new ForbiddenException('Access denied to this project');
+    // Authorization Check
+    if (role !== 'admin') {
+      if (role === 'developer') {
+        const isTeamMember = project.teamMembers.some(t => t.profileId === userId);
+        if (!isTeamMember) throw new ForbiddenException('Access denied to this project');
+      } else {
+        // Stakeholder check (Owner or invited guest)
+        const isOwner = project.userId === userId;
+        const isInvitedStakeholder = project.stakeholders.some(s => s.profileId === userId);
+        if (!isOwner && !isInvitedStakeholder) {
+          throw new ForbiddenException('Access denied to this project');
+        }
+      }
     }
     
     // Calculate progress
@@ -109,5 +146,34 @@ export class ProjectsService {
         objectives: dto.objectives,
       }
     });
+  }
+
+  async addStakeholder(projectId: string, profileId: string) {
+    const project = await this.prisma.project.findUnique({ where: { id: projectId } });
+    if (!project) throw new NotFoundException('Project not found');
+
+    const profile = await this.prisma.profile.findUnique({ where: { id: profileId } });
+    if (!profile) throw new NotFoundException('Profile not found');
+
+    return this.prisma.projectStakeholder.create({
+      data: { projectId, profileId },
+      include: { profile: true }
+    });
+  }
+
+  async removeStakeholder(projectId: string, profileId: string) {
+    const record = await this.prisma.projectStakeholder.findUnique({
+      where: {
+        projectId_profileId: { projectId, profileId }
+      }
+    });
+    if (!record) throw new NotFoundException('Stakeholder assignment not found');
+
+    await this.prisma.projectStakeholder.delete({
+      where: {
+        projectId_profileId: { projectId, profileId }
+      }
+    });
+    return { message: 'Stakeholder access removed' };
   }
 }

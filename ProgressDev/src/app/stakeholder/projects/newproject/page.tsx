@@ -4,37 +4,67 @@ import React, { useState } from "react";
 import { motion, AnimatePresence, motion as m } from "framer-motion";
 import {
   ChevronRight,
-  Search,
-  Bell,
-  Settings,
   X,
-  ChevronDown,
   Calendar,
-  Terminal,
-  GitBranch,
   ShieldCheck,
-  CheckCircle2,
   Loader2,
 } from "lucide-react";
-
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbPage,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import Link from "next/link";
 import { projectsApi, usersApi, ApiProfile } from "@/lib/api";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxContent,
+  ComboboxList,
+  ComboboxItem,
+  ComboboxEmpty,
+} from "@/components/ui/combobox";
 
-type Priority = "low" | "med" | "high";
+const formatRupiah = (val: string) => {
+  if (!val) return "Rp 0";
+  const num = parseInt(val, 10);
+  if (isNaN(num)) return "Rp 0";
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(num);
+};
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return "";
+  try {
+    return new Date(dateString).toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  } catch {
+    return dateString;
+  }
+};
 
 export default function CreateProject() {
   const router = useRouter();
+  const pathname = usePathname();
+  const segments = pathname.split("/").filter(Boolean);
   const { data: session } = useSession();
-  const [priority, setPriority] = useState<Priority>("high");
-  const [selectedTemplate, setSelectedTemplate] = useState<string>("agile");
   const [teamMembers, setTeamMembers] = useState<ApiProfile[]>([]);
   const [developers, setDevelopers] = useState<ApiProfile[]>([]);
   const [selectedLeadId, setSelectedLeadId] = useState<string>("");
 
   const [formData, setFormData] = useState({
     platformName: "",
-    description: "",
     durationEnd: "",
     budget: "",
   });
@@ -85,7 +115,7 @@ export default function CreateProject() {
     }
   };
 
-  // Variasi Animasi Penurunan Staggered
+  // Staggered Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -113,13 +143,44 @@ export default function CreateProject() {
 
           <div className="max-w-6xl mx-auto">
             <header className="mb-8">
-              <div className="flex items-center gap-1 text-foreground mb-2 text-[14px]">
-                <a className="hover:text-[#0058be] transition-colors" href="#">
-                  Projects
-                </a>
-                <ChevronRight className="w-4 h-4 text-[#75777d]" />
-                <span className="text-[#091426] font-medium">New Project</span>
-              </div>
+              {/* Breadcrumb section */}
+              <Breadcrumb className="mb-4">
+                <BreadcrumbList className="text-[12px] font-semibold tracking-wider text-[#75777d] uppercase">
+                  {segments.map((segment, index) => {
+                    const href = `/${segments.slice(0, index + 1).join("/")}`;
+                    const isLast = index === segments.length - 1;
+                    const mapping = {
+                      stakeholder: { label: "Stakeholder", href: "#" },
+                      projects: { label: "Projects", href: "/stakeholder/projects" },
+                      newproject: { label: "New Project", href: "/stakeholder/projects/newproject" },
+                    }[segment] || { label: segment, href };
+
+                    return (
+                      <React.Fragment key={segment}>
+                        <BreadcrumbItem>
+                          {isLast ? (
+                            <BreadcrumbPage className="font-bold text-[#0b1c30]">
+                              {mapping.label}
+                            </BreadcrumbPage>
+                          ) : (
+                            <BreadcrumbLink asChild>
+                              <Link
+                                href={mapping.href}
+                                className="text-[#75777d] hover:text-[#0058be] transition-colors"
+                              >
+                                {mapping.label}
+                              </Link>
+                            </BreadcrumbLink>
+                          )}
+                        </BreadcrumbItem>
+                        {!isLast && (
+                          <BreadcrumbSeparator className="text-[#75777d]" />
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </BreadcrumbList>
+              </Breadcrumb>
               <h1 className="text-[30px] font-bold text-[#091426] tracking-tight">
                 Create New Project
               </h1>
@@ -168,27 +229,6 @@ export default function CreateProject() {
                         }
                       />
                     </div>
-                    <div>
-                      <label
-                        className="block text-[14px] font-medium text-[#091426] mb-2"
-                        htmlFor="p-desc"
-                      >
-                        Description
-                      </label>
-                      <textarea
-                        className="w-full px-4 py-3 rounded-lg border border-[#c5c6cd] focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10 transition-all outline-none bg-[#f8f9ff] resize-none text-[14px]"
-                        id="p-desc"
-                        placeholder="Provide technical scope and objectives..."
-                        rows={6}
-                        value={formData.description}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            description: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
                   </div>
                 </m.section>
 
@@ -205,23 +245,35 @@ export default function CreateProject() {
                       <label className="block text-[14px] font-medium text-[#091426] mb-2">
                         Project Lead
                       </label>
-                      <div className="relative">
-                        <select
-                          className="w-full appearance-none px-4 py-3 rounded-lg border border-[#c5c6cd] focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10 transition-all outline-none bg-[#f8f9ff] pr-10 text-[14px]"
-                          value={selectedLeadId}
-                          onChange={(e) => setSelectedLeadId(e.target.value)}
-                        >
-                          <option value="" disabled>
-                            Select Lead
-                          </option>
-                          {developers.map((dev) => (
-                            <option key={dev.id} value={dev.id}>
-                              {dev.displayName || dev.email}
-                            </option>
-                          ))}
-                        </select>
-                        <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#75777d]" />
-                      </div>
+                      <Combobox
+                        value={selectedLeadId}
+                        onValueChange={(val) => setSelectedLeadId(val || "")}
+                      >
+                        <div className="relative">
+                          <ComboboxInput
+                            placeholder="Search & select lead..."
+                            className="w-full px-4 py-3 rounded-lg border border-[#c5c6cd] focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10 transition-all outline-none bg-[#f8f9ff] text-[14px]"
+                          />
+                        </div>
+                        <ComboboxContent className="bg-white border border-[#c5c6cd] rounded-lg shadow-md max-h-60 overflow-y-auto z-50">
+                          <ComboboxList>
+                            {developers.map((dev) => (
+                              <ComboboxItem
+                                key={dev.id}
+                                value={dev.id}
+                                className="px-4 py-2 hover:bg-[#eff4ff] cursor-pointer text-[14px] flex items-center justify-between"
+                              >
+                                <span>{dev.displayName || dev.email}</span>
+                              </ComboboxItem>
+                            ))}
+                            {developers.length === 0 && (
+                              <ComboboxEmpty className="p-4 text-center text-sm text-[#75777d]">
+                                No leads found
+                              </ComboboxEmpty>
+                            )}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
                     </div>
                     <div>
                       <label className="block text-[14px] font-medium text-[#091426] mb-2">
@@ -279,23 +331,37 @@ export default function CreateProject() {
 
               {/* Right Column: Settings & Meta */}
               <div className="md:col-span-4 space-y-6">
-                {/* Schedule & Rank */}
+                {/* Schedule & Budget */}
                 <m.section
                   variants={itemVariants}
-                  className="bg-[#eff4ff] border border-[#c5c6cd] p-6 rounded-xl"
+                  className="bg-[#eff4ff] border border-[#c5c6cd] p-6 rounded-xl space-y-6"
                 >
-                  <h2 className="text-[20px] font-bold text-[#091426] mb-6">
-                    Schedule & Rank
+                  <h2 className="text-[20px] font-bold text-[#091426] mb-2">
+                    Schedule & Budget
                   </h2>
                   <div className="space-y-6">
+                    {/* DatePicker */}
                     <div>
                       <label className="block text-[14px] font-medium text-[#091426] mb-2">
                         Deadline
                       </label>
                       <div className="relative">
+                        <button
+                          type="button"
+                          className="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-[#c5c6cd] hover:border-[#0058be] transition-all bg-[#f8f9ff] text-[14px] outline-none cursor-pointer"
+                          onClick={() => {
+                            document.getElementById("deadline-input")?.showPicker();
+                          }}
+                        >
+                          <span className={formData.durationEnd ? "text-[#0b1c30]" : "text-[#75777d]"}>
+                            {formData.durationEnd ? formatDate(formData.durationEnd) : "Select Deadline"}
+                          </span>
+                          <Calendar className="w-4 h-4 text-[#75777d]" />
+                        </button>
                         <input
-                          className="w-full px-4 py-3 rounded-lg border border-[#c5c6cd] focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10 transition-all outline-none bg-[#f8f9ff] text-[14px]"
+                          id="deadline-input"
                           type="date"
+                          className="absolute inset-0 opacity-0 pointer-events-none"
                           value={formData.durationEnd}
                           onChange={(e) =>
                             setFormData({
@@ -304,108 +370,31 @@ export default function CreateProject() {
                             })
                           }
                         />
-                        <Calendar className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#75777d]" />
                       </div>
                     </div>
-                    <div>
-                      <label className="block text-[14px] font-medium text-[#091426] mb-2">
-                        Priority Level
-                      </label>
-                      <div className="grid grid-cols-3 gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setPriority("low")}
-                          className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-all ${priority === "low" ? "border-[#0058be] bg-[#d3e4fe]" : "border-[#c5c6cd] bg-[#f8f9ff]"}`}
-                        >
-                          <span className="w-3 h-3 rounded-full bg-[#0058be]"></span>
-                          <span
-                            className={`text-[12px] ${priority === "low" ? "text-[#0058be] font-bold" : "text-foreground"}`}
-                          >
-                            Low
-                          </span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPriority("med")}
-                          className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-all ${priority === "med" ? "border-[#0058be] bg-[#d3e4fe]" : "border-[#c5c6cd] bg-[#f8f9ff]"}`}
-                        >
-                          <span className="w-3 h-3 rounded-full bg-[#0d0093]"></span>
-                          <span
-                            className={`text-[12px] ${priority === "med" ? "text-[#0058be] font-bold" : "text-foreground"}`}
-                          >
-                            Med
-                          </span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPriority("high")}
-                          className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-all ${priority === "high" ? "border-[#0058be] bg-[#d3e4fe]" : "border-[#c5c6cd] bg-[#f8f9ff]"}`}
-                        >
-                          <span className="w-3 h-3 rounded-full bg-[#ba1a1a]"></span>
-                          <span
-                            className={`text-[12px] ${priority === "high" ? "text-[#0058be] font-bold" : "text-foreground"}`}
-                          >
-                            High
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-[14px] font-medium text-[#091426] mb-2">
-                        Budget ($)
-                      </label>
-                      <input
-                        className="w-full px-4 py-3 rounded-lg border border-[#c5c6cd] focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10 transition-all outline-none bg-[#f8f9ff] text-[14px]"
-                        type="number"
-                        placeholder="e.g. 50000"
-                        value={formData.budget}
-                        onChange={(e) =>
-                          setFormData({ ...formData, budget: e.target.value })
-                        }
-                      />
-                    </div>
-                  </div>
-                </m.section>
 
-                {/* Project Template Selection */}
-                <m.section
-                  variants={itemVariants}
-                  className="bg-white border border-[#c5c6cd] p-6 rounded-xl shadow-sm"
-                >
-                  <h2 className="text-[20px] font-bold text-[#091426] mb-1">
-                    Template
-                  </h2>
-                  <p className="text-foreground text-[12px] mb-4">
-                    Select a workflow structure to pre-fill tasks.
-                  </p>
-                  <div className="space-y-2">
-                    <div
-                      onClick={() => setSelectedTemplate("agile")}
-                      className={`flex items-center justify-between p-3 border rounded-lg transition-colors cursor-pointer group ${selectedTemplate === "agile" ? "border-[#0058be] bg-[#eff4ff]" : "border-[#c5c6cd] hover:bg-[#eff4ff]"}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Terminal className="w-4 h-4 text-[#0058be]" />
-                        <span className="text-[14px] font-medium text-[#091426]">
-                          Agile Sprint
+                    {/* Budget in Rupiah */}
+                    <div>
+                      <label className="block text-[14px] font-medium text-[#091426] mb-2">
+                        Budget (IDR)
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#75777d] font-semibold">
+                          Rp
                         </span>
+                        <input
+                          className="w-full px-4 py-3 pl-10 rounded-lg border border-[#c5c6cd] focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10 transition-all outline-none bg-[#f8f9ff] text-[14px]"
+                          type="number"
+                          placeholder="e.g. 50000000"
+                          value={formData.budget}
+                          onChange={(e) =>
+                            setFormData({ ...formData, budget: e.target.value })
+                          }
+                        />
                       </div>
-                      <CheckCircle2
-                        className={`w-4 h-4 text-[#0058be] transition-opacity ${selectedTemplate === "agile" ? "opacity-100" : "opacity-0 group-hover:opacity-40"}`}
-                      />
-                    </div>
-                    <div
-                      onClick={() => setSelectedTemplate("kanban")}
-                      className={`flex items-center justify-between p-3 border rounded-lg transition-colors cursor-pointer group ${selectedTemplate === "kanban" ? "border-[#0058be] bg-[#eff4ff]" : "border-[#c5c6cd] hover:bg-[#eff4ff]"}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <GitBranch className="w-4 h-4 text-[#0058be]" />
-                        <span className="text-[14px] font-medium text-[#091426]">
-                          Kanban Flow
-                        </span>
-                      </div>
-                      <CheckCircle2
-                        className={`w-4 h-4 text-[#0058be] transition-opacity ${selectedTemplate === "kanban" ? "opacity-100" : "opacity-0 group-hover:opacity-40"}`}
-                      />
+                      <p className="mt-1.5 text-xs font-semibold text-[#0058be]">
+                        Value: {formatRupiah(formData.budget)}
+                      </p>
                     </div>
                   </div>
                 </m.section>
@@ -418,7 +407,7 @@ export default function CreateProject() {
                   <button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="w-full py-3 bg-[#0058be] text-white rounded-lg text-[14px] font-bold shadow-lg shadow-[#0058be]/20 hover:bg-[#0058be]/90 active:scale-[0.98] transition-all disabled:opacity-50 flex justify-center items-center gap-2"
+                    className="w-full py-3 bg-[#0058be] text-white rounded-lg text-[14px] font-bold shadow-lg shadow-[#0058be]/20 hover:bg-[#0058be]/90 active:scale-[0.98] transition-all disabled:opacity-50 flex justify-center items-center gap-2 cursor-pointer"
                   >
                     {isSubmitting && (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -427,7 +416,7 @@ export default function CreateProject() {
                   </button>
                   <button
                     onClick={() => router.push("/stakeholder/dashboard")}
-                    className="w-full py-3 bg-[#d3e4fe] text-[#0058be] rounded-lg text-[14px] font-medium hover:bg-[#dce9ff] transition-all"
+                    className="w-full py-3 bg-[#d3e4fe] text-[#0058be] rounded-lg text-[14px] font-medium hover:bg-[#dce9ff] transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -464,14 +453,14 @@ export default function CreateProject() {
               <div className="p-4 rounded-2xl border border-[#c5c6cd] border-dashed bg-white/50 backdrop-blur-sm">
                 <div className="flex items-center gap-4 mb-3">
                   <div className="p-2 bg-[#0058be]/10 rounded-lg text-[#0058be]">
-                    <GitBranch className="w-5 h-5" />
+                    <Calendar className="w-5 h-5" />
                   </div>
                   <div>
                     <h4 className="text-[14px] font-bold text-[#091426]">
-                      Team Integration
+                      Milestone Tracking
                     </h4>
                     <p className="text-[12px] text-foreground">
-                      Direct sync with GitHub and Jira tickets.
+                      Precise date logging and timeline planning.
                     </p>
                   </div>
                 </div>
