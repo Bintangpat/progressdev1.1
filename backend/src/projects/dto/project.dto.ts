@@ -9,14 +9,18 @@ export const CreateProjectSchema = z.object({
   durationEnd: z.string().datetime(),
   developerWhatsapp: z.string().min(9, 'Nomor whatsapp tidak valid'),
   budget: z.number().optional().default(0),
-  teamMembers: z.array(z.object({
-    profileId: z.string().uuid(),
-    role: z.string()
-  })).optional()
+  teamMembers: z
+    .array(
+      z.object({
+        profileId: z.string().uuid(),
+        role: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 export const UpdateProjectSchema = CreateProjectSchema.partial().extend({
-  status: z.nativeEnum(ProjectStatus).optional()
+  status: z.nativeEnum(ProjectStatus).optional(),
 });
 
 export const CreateBriefSchema = z.object({

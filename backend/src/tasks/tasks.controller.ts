@@ -1,7 +1,23 @@
-import { Controller, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { TasksService } from './tasks.service';
-import { CreateTaskDto, UpdateTaskDto, CreateChecklistDto, UpdateChecklistDto } from './dto/task.dto';
+import {
+  CreateTaskDto,
+  UpdateTaskDto,
+  CreateChecklistDto,
+  UpdateChecklistDto,
+} from './dto/task.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../guards/roles.decorator';
@@ -21,9 +37,9 @@ export class TasksController {
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Upload a screenshot for a task' })
   async uploadScreenshot(
-    @Param('id') taskId: string, 
-    @UploadedFile() file: Express.Multer.File, 
-    @CurrentUser() user: any
+    @Param('id') taskId: string,
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: any,
   ) {
     if (!file) throw new BadRequestException('File is required');
     return this.tasksService.uploadScreenshot(taskId, file, user.id, user.role);
@@ -39,8 +55,17 @@ export class TasksController {
   @Patch(':id/status')
   @Roles(Role.admin, Role.developer)
   @ApiOperation({ summary: 'Update task status/details' })
-  updateStatus(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto, @CurrentUser() user: any) {
-    return this.tasksService.updateStatus(id, updateTaskDto, user.id, user.role);
+  updateStatus(
+    @Param('id') id: string,
+    @Body() updateTaskDto: UpdateTaskDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.tasksService.updateStatus(
+      id,
+      updateTaskDto,
+      user.id,
+      user.role,
+    );
   }
 
   @Delete(':id')
@@ -53,15 +78,33 @@ export class TasksController {
   @Post(':id/checklist')
   @Roles(Role.admin, Role.developer)
   @ApiOperation({ summary: 'Add a checklist item to a task' })
-  addChecklist(@Param('id') taskId: string, @Body() createChecklistDto: CreateChecklistDto, @CurrentUser() user: any) {
-    return this.tasksService.addChecklist(taskId, createChecklistDto, user.id, user.role);
+  addChecklist(
+    @Param('id') taskId: string,
+    @Body() createChecklistDto: CreateChecklistDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.tasksService.addChecklist(
+      taskId,
+      createChecklistDto,
+      user.id,
+      user.role,
+    );
   }
 
   @Patch('checklist/:id')
   @Roles(Role.admin, Role.developer)
   @ApiOperation({ summary: 'Update a checklist item (e.g. check/uncheck)' })
-  updateChecklist(@Param('id') checklistId: string, @Body() updateChecklistDto: UpdateChecklistDto, @CurrentUser() user: any) {
-    return this.tasksService.updateChecklist(checklistId, updateChecklistDto, user.id, user.role);
+  updateChecklist(
+    @Param('id') checklistId: string,
+    @Body() updateChecklistDto: UpdateChecklistDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.tasksService.updateChecklist(
+      checklistId,
+      updateChecklistDto,
+      user.id,
+      user.role,
+    );
   }
 
   @Delete('checklist/:id')

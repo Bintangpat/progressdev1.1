@@ -14,7 +14,9 @@ export class UsersService {
     return this.prisma.profile.findUnique({ where: { id } });
   }
 
-  async findByIdWithoutPassword(id: string): Promise<Omit<Profile, 'password'> | null> {
+  async findByIdWithoutPassword(
+    id: string,
+  ): Promise<Omit<Profile, 'password'> | null> {
     const user = await this.prisma.profile.findUnique({ where: { id } });
     if (!user) return null;
     const { password, ...result } = user;
@@ -36,11 +38,12 @@ export class UsersService {
   ): Promise<Profile> {
     const profileData: Prisma.ProfileCreateInput = {
       ...data,
-      workspaces: workspaces && workspaces.length > 0
-        ? {
-            connect: workspaces.map((name) => ({ name })),
-          }
-        : undefined,
+      workspaces:
+        workspaces && workspaces.length > 0
+          ? {
+              connect: workspaces.map((name) => ({ name })),
+            }
+          : undefined,
     };
 
     const profile = await this.prisma.profile.create({

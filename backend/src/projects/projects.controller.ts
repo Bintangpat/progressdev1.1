@@ -1,6 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { CreateProjectDto, UpdateProjectDto, CreateBriefDto } from './dto/project.dto';
+import {
+  CreateProjectDto,
+  UpdateProjectDto,
+  CreateBriefDto,
+} from './dto/project.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../guards/roles.decorator';
@@ -49,7 +62,11 @@ export class ProjectsController {
   @Roles(Role.admin, Role.developer, Role.stakeholder)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update project' })
-  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto, @CurrentUser() user: any) {
+  update(
+    @Param('id') id: string,
+    @Body() updateProjectDto: UpdateProjectDto,
+    @CurrentUser() user: any,
+  ) {
     return this.projectsService.update(id, updateProjectDto, user.id);
   }
 
@@ -74,8 +91,13 @@ export class ProjectsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.admin)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Add additional stakeholder guest to project (Admin)' })
-  addStakeholder(@Param('id') id: string, @Body('profileId') profileId: string) {
+  @ApiOperation({
+    summary: 'Add additional stakeholder guest to project (Admin)',
+  })
+  addStakeholder(
+    @Param('id') id: string,
+    @Body('profileId') profileId: string,
+  ) {
     return this.projectsService.addStakeholder(id, profileId);
   }
 
@@ -83,8 +105,13 @@ export class ProjectsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.admin)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Remove additional stakeholder guest from project (Admin)' })
-  removeStakeholder(@Param('id') id: string, @Param('profileId') profileId: string) {
+  @ApiOperation({
+    summary: 'Remove additional stakeholder guest from project (Admin)',
+  })
+  removeStakeholder(
+    @Param('id') id: string,
+    @Param('profileId') profileId: string,
+  ) {
     return this.projectsService.removeStakeholder(id, profileId);
   }
 }

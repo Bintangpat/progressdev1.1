@@ -44,16 +44,22 @@ export class UsersController {
     // Business Logic: Developer must have team and workspaces
     if (createUserDto.role === 'developer') {
       if (!createUserDto.team) {
-        throw new BadRequestException('Developer wajib dimasukkan ke dalam team/department');
+        throw new BadRequestException(
+          'Developer wajib dimasukkan ke dalam team/department',
+        );
       }
       if (!createUserDto.workspaces || createUserDto.workspaces.length === 0) {
-        throw new BadRequestException('Developer wajib memilih minimal satu workspace');
+        throw new BadRequestException(
+          'Developer wajib memilih minimal satu workspace',
+        );
       }
     }
 
     // Ignore workspaces and team for Admin and Stakeholder
-    const workspaces = createUserDto.role === 'developer' ? createUserDto.workspaces : undefined;
-    const team = createUserDto.role === 'developer' ? createUserDto.team : undefined;
+    const workspaces =
+      createUserDto.role === 'developer' ? createUserDto.workspaces : undefined;
+    const team =
+      createUserDto.role === 'developer' ? createUserDto.team : undefined;
 
     let tempPassword = '';
     let hashedPassword: string | null = null;
@@ -62,7 +68,9 @@ export class UsersController {
       hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     } else {
       // Generate secure random temporary password
-      tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).toUpperCase().slice(-4);
+      tempPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).toUpperCase().slice(-4);
       hashedPassword = await bcrypt.hash(tempPassword, 10);
     }
 
@@ -71,7 +79,7 @@ export class UsersController {
         email: createUserDto.email,
         password: hashedPassword,
         displayName: createUserDto.displayName,
-        role: createUserDto.role as Role,
+        role: createUserDto.role,
       },
       workspaces,
       team,
@@ -102,7 +110,7 @@ export class UsersController {
     @Param('id') id: string,
     @Body() updateUserDto: Partial<CreateUserDto>,
   ) {
-    let updateData: any = { ...updateUserDto };
+    const updateData: any = { ...updateUserDto };
     if (updateUserDto.password) {
       updateData.password = await bcrypt.hash(updateUserDto.password, 10);
     }
@@ -187,9 +195,14 @@ export class UsersController {
     return { message: 'Account successfully deactivated' };
   }
 
-  private async sendInvitationEmail(email: string, name: string, tempPass: string) {
+  private async sendInvitationEmail(
+    email: string,
+    name: string,
+    tempPass: string,
+  ) {
     const apiKey = process.env.RESEND_API_KEY;
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'no-reply@authentication.web.id';
+    const fromEmail =
+      process.env.RESEND_FROM_EMAIL || 'no-reply@authentication.web.id';
 
     if (!apiKey) {
       throw new Error('RESEND_API_KEY tidak dikonfigurasi di environment');
@@ -198,7 +211,7 @@ export class UsersController {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

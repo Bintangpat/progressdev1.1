@@ -1,4 +1,13 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Get,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -30,7 +39,9 @@ export class AuthController {
   @Post('social-login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login or register via social provider' })
-  async socialLogin(@Body() data: { email: string; name: string; image?: string }) {
+  async socialLogin(
+    @Body() data: { email: string; name: string; image?: string },
+  ) {
     return this.authService.socialLogin(data);
   }
 }

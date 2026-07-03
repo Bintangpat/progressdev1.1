@@ -32,7 +32,11 @@ export class CloudinaryStorageService implements StorageService {
     });
   }
 
-  async uploadScreenshot(file: Express.Multer.File, taskId: string, userId: string): Promise<string> {
+  async uploadScreenshot(
+    file: Express.Multer.File,
+    taskId: string,
+    userId: string,
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
@@ -45,10 +49,14 @@ export class CloudinaryStorageService implements StorageService {
             return reject(new InternalServerErrorException(error.message));
           }
           if (!result) {
-            return reject(new InternalServerErrorException('Cloudinary upload failed: no result returned'));
+            return reject(
+              new InternalServerErrorException(
+                'Cloudinary upload failed: no result returned',
+              ),
+            );
           }
           resolve(result.secure_url);
-        }
+        },
       );
 
       streamifier.createReadStream(file.buffer).pipe(uploadStream);
