@@ -13,7 +13,7 @@ async function bootstrap() {
   });
 
   // Global Validation
-  app.useGlobalPipes(new ZodValidationPi  pe());
+  app.useGlobalPipes(new ZodValidationPipe());
 
   // Swagger Configuration
   const config = new DocumentBuilder()

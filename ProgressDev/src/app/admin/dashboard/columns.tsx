@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { ApiProject } from "@/lib/api";
-import { Badge } from "@/components/ui/badge";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -73,7 +73,9 @@ export const columns: ColumnDef<ApiProject>[] = [
         <span
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${styles[health] || ""}`}
         >
-          <span className={`w-1.5 h-1.5 rounded-full ${dots[health] || ""}`}></span>
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${dots[health] || ""}`}
+          ></span>
           {health}
         </span>
       );
@@ -161,7 +163,11 @@ export const columns: ColumnDef<ApiProject>[] = [
       const meta = table.options.meta as any;
 
       const handleDelete = async () => {
-        if (confirm(`Are you sure you want to delete project: ${proj.platformName}?`)) {
+        if (
+          confirm(
+            `Are you sure you want to delete project: ${proj.platformName}?`,
+          )
+        ) {
           try {
             await projectsApi.delete(proj.id);
             toast.success("Project deleted successfully");
@@ -178,7 +184,11 @@ export const columns: ColumnDef<ApiProject>[] = [
         <div className="text-right">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-[#e5eeff] cursor-pointer">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 hover:bg-[#e5eeff] cursor-pointer"
+              >
                 <Ellipsis className="h-4.5 w-4.5" />
               </Button>
             </DropdownMenuTrigger>
