@@ -39,15 +39,21 @@ export default function StakeholderDashboard() {
   }, [session]);
 
   const activeProjects = projects.filter((p) => p.status !== "completed");
-  const overallCompletion = activeProjects.length > 0
-    ? activeProjects.reduce((acc, p) => acc + (p.progress || 0), 0) / activeProjects.length
-    : 0;
-  
+  const overallCompletion =
+    activeProjects.length > 0
+      ? activeProjects.reduce((acc, p) => acc + (p.progress || 0), 0) /
+        activeProjects.length
+      : 0;
+
   // Hitung total budget burn rate (disimulasikan dari persentase budget yang terpakai)
-  const totalBudget = activeProjects.reduce((acc, p) => acc + (p.budget || 0), 0);
-  const formattedBudget = totalBudget >= 1000000 
-    ? `$${(totalBudget / 1000000).toFixed(1)}M`
-    : `$${(totalBudget / 1000).toFixed(1)}k`;
+  const totalBudget = activeProjects.reduce(
+    (acc, p) => acc + (p.budget || 0),
+    0,
+  );
+  const formattedBudget =
+    totalBudget >= 1000000
+      ? `$${(totalBudget / 1000000).toFixed(1)}M`
+      : `$${(totalBudget / 1000).toFixed(1)}k`;
 
   // Variasi Animasi Framer Motion
   const containerVariants = {
@@ -71,47 +77,8 @@ export default function StakeholderDashboard() {
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] text-[#0b1c30] font-sans selection:bg-[#0058be]/20">
-      {/* TopNavBar Anchor (Full Width) */}
-      <header className="fixed top-0 left-0 w-full h-16 bg-[#f8f9ff] border-b border-[#c5c6cd] flex justify-between items-center px-8 z-50">
-        <div className="flex items-center gap-6">
-          <div className="mr-8">
-            <h1 className="text-[24px] font-bold text-[#091426] tracking-tight leading-none">
-              DevProgress
-            </h1>
-          </div>
-          <div className="relative w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#45474c] w-5 h-5" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-[#eff4ff] border border-[#c5c6cd] rounded-lg text-[14px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition-all"
-              placeholder="Search milestones or projects..."
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <button className="p-2 hover:bg-[#e5eeff] rounded-full transition-all text-[#45474c]">
-            <BellRing className="w-5 h-5" />
-          </button>
-          <Link href="/stakeholder/newproject">
-            <button className="px-4 py-2 bg-[#091426] text-white text-[14px] font-medium rounded-lg hover:bg-[#091426]/90 transition-all flex items-center gap-2">
-              <Plus className="w-4 h-4" /> New Project
-            </button>
-          </Link>
-          <div className="ml-2 flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-[#091426] flex items-center justify-center text-white font-bold overflow-hidden border border-[#c5c6cd]">
-              <div className="w-full h-full bg-[#0058be] flex items-center justify-center text-xs text-white uppercase">
-                {session?.user?.name?.[0] || 'U'}
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Main Content Canvas */}
-      <main className="w-full mt-16 p-8 min-h-screen max-w-7xl mx-auto">
+      <main className="w-full p-8 min-h-screen max-w-7xl ">
         {/* Dashboard Header */}
         <div className="flex justify-between items-end mb-8">
           <div>
@@ -125,7 +92,7 @@ export default function StakeholderDashboard() {
           <div>
             <div className="px-4 py-2 bg-white border border-[#c5c6cd] rounded-lg flex items-center gap-2 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-[12px] font-semibold text-[#45474c]">
+              <span className="text-[12px] font-semibold text-foreground">
                 System Status: Optimal
               </span>
             </div>
@@ -145,7 +112,7 @@ export default function StakeholderDashboard() {
             className="bg-white/80 backdrop-blur-md border border-[#e2e8f0] p-6 rounded-xl flex flex-col justify-between shadow-sm"
           >
             <div>
-              <p className="text-[12px] font-semibold text-[#45474c] uppercase tracking-wider">
+              <p className="text-[12px] font-semibold text-foreground uppercase tracking-wider">
                 Overall Completion
               </p>
               <div className="flex items-end gap-1 mt-2">
@@ -172,13 +139,13 @@ export default function StakeholderDashboard() {
             variants={itemVariants}
             className="bg-white/80 backdrop-blur-md border border-[#e2e8f0] p-6 rounded-xl shadow-sm"
           >
-            <p className="text-[12px] font-semibold text-[#45474c] uppercase tracking-wider">
+            <p className="text-[12px] font-semibold text-foreground uppercase tracking-wider">
               Velocity
             </p>
             <div className="mt-2">
               <span className="text-[30px] font-bold text-[#091426]">
                 {activeProjects.length}{" "}
-                <span className="text-[20px] font-normal text-[#45474c]">
+                <span className="text-[20px] font-normal text-foreground">
                   projects
                 </span>
               </span>
@@ -197,7 +164,7 @@ export default function StakeholderDashboard() {
             variants={itemVariants}
             className="bg-white/80 backdrop-blur-md border border-[#e2e8f0] p-6 rounded-xl shadow-sm"
           >
-            <p className="text-[12px] font-semibold text-[#45474c] uppercase tracking-wider">
+            <p className="text-[12px] font-semibold text-foreground uppercase tracking-wider">
               Est. Completion
             </p>
             <div className="mt-2">
@@ -205,7 +172,7 @@ export default function StakeholderDashboard() {
                 {activeProjects.length > 0 ? "Q3 2026" : "N/A"}
               </span>
             </div>
-            <p className="text-[14px] text-[#45474c] mt-6 flex items-center gap-2">
+            <p className="text-[14px] text-foreground mt-6 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-[#0058be]" /> Est. Release
             </p>
           </motion.div>
@@ -215,13 +182,13 @@ export default function StakeholderDashboard() {
             variants={itemVariants}
             className="bg-white/80 backdrop-blur-md border border-[#e2e8f0] p-6 rounded-xl shadow-sm"
           >
-            <p className="text-[12px] font-semibold text-[#45474c] uppercase tracking-wider">
+            <p className="text-[12px] font-semibold text-foreground uppercase tracking-wider">
               Budget Burn Rate
             </p>
             <div className="mt-2">
               <span className="text-[30px] font-bold text-[#091426]">
                 {formattedBudget}{" "}
-                <span className="text-[20px] font-normal text-[#45474c]">
+                <span className="text-[20px] font-normal text-foreground">
                   Total
                 </span>
               </span>
@@ -257,7 +224,7 @@ export default function StakeholderDashboard() {
                     <h4 className="text-[14px] font-bold text-[#091426]">
                       Cloud Infrastructure Foundation
                     </h4>
-                    <p className="text-[14px] text-[#45474c] mt-1">
+                    <p className="text-[14px] text-foreground mt-1">
                       Completion of core networking and security protocols for
                       the Enterprise Migration.
                     </p>
@@ -265,7 +232,7 @@ export default function StakeholderDashboard() {
                       <span className="text-[12px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
                         Completed
                       </span>
-                      <span className="text-[12px] text-[#45474c]">
+                      <span className="text-[12px] text-foreground">
                         May 12, 2024
                       </span>
                     </div>
@@ -281,7 +248,7 @@ export default function StakeholderDashboard() {
                     <h4 className="text-[14px] font-bold text-[#091426]">
                       Payment API Alpha Release
                     </h4>
-                    <p className="text-[14px] text-[#45474c] mt-1">
+                    <p className="text-[14px] text-foreground mt-1">
                       Internal testing phase for the new unified checkout
                       experience.
                     </p>
@@ -289,7 +256,7 @@ export default function StakeholderDashboard() {
                       <span className="text-[12px] font-semibold text-[#0058be] bg-[#d8e2ff] px-2 py-0.5 rounded">
                         In Progress
                       </span>
-                      <span className="text-[12px] text-[#45474c]">
+                      <span className="text-[12px] text-foreground">
                         Est. July 20, 2024
                       </span>
                     </div>
@@ -310,14 +277,14 @@ export default function StakeholderDashboard() {
                     <h4 className="text-[14px] font-bold text-[#091426]">
                       Global Data Audit Completion
                     </h4>
-                    <p className="text-[14px] text-[#45474c] mt-1">
+                    <p className="text-[14px] text-foreground mt-1">
                       Compliance validation for EMEA and APAC regions.
                     </p>
                     <div className="flex gap-4 mt-2">
-                      <span className="text-[12px] font-semibold text-[#45474c] bg-[#eff4ff] px-2 py-0.5 rounded">
+                      <span className="text-[12px] font-semibold text-foreground bg-[#eff4ff] px-2 py-0.5 rounded">
                         Upcoming
                       </span>
-                      <span className="text-[12px] text-[#45474c]">
+                      <span className="text-[12px] text-foreground">
                         Sept 05, 2024
                       </span>
                     </div>
@@ -379,31 +346,33 @@ export default function StakeholderDashboard() {
 
             {/* Recent Project Card (Featured) */}
             {activeProjects.length > 0 ? (
-            <Link href={`/stakeholder/${activeProjects[0].publicSlug}`}>
-              <div className="relative overflow-hidden group rounded-xl border border-[#c5c6cd] h-64 shadow-sm cursor-pointer">
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110 bg-[#091426]"
-                  style={{
-                    backgroundImage: `url('https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=600&auto=format&fit=crop')`,
-                  }}
-                ></div>
-                <div className="absolute inset-0 bg-linear-to-t from-[#091426]/90 via-[#091426]/40 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 p-6 text-white">
-                  <span className="px-2 py-0.5 bg-[#0058be] text-[10px] font-bold rounded uppercase tracking-wider">
-                    Current Priority
-                  </span>
-                  <h4 className="text-[20px] font-bold mt-2">
-                    {activeProjects[0].platformName}
-                  </h4>
-                  <p className="text-sm opacity-80 mt-1">
-                    {activeProjects[0].stakeholderName}
-                  </p>
+              <Link href={`/stakeholder/${activeProjects[0].publicSlug}`}>
+                <div className="relative overflow-hidden group rounded-xl border border-[#c5c6cd] h-64 shadow-sm cursor-pointer">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110 bg-[#091426]"
+                    style={{
+                      backgroundImage: `url('https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=600&auto=format&fit=crop')`,
+                    }}
+                  ></div>
+                  <div className="absolute inset-0 bg-linear-to-t from-[#091426]/90 via-[#091426]/40 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 p-6 text-white">
+                    <span className="px-2 py-0.5 bg-[#0058be] text-[10px] font-bold rounded uppercase tracking-wider">
+                      Current Priority
+                    </span>
+                    <h4 className="text-[20px] font-bold mt-2">
+                      {activeProjects[0].platformName}
+                    </h4>
+                    <p className="text-sm opacity-80 mt-1">
+                      {activeProjects[0].stakeholderName}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
             ) : (
               <div className="relative overflow-hidden rounded-xl border border-dashed border-[#c5c6cd] bg-[#eff4ff]/50 flex items-center justify-center h-64 shadow-sm">
-                <p className="text-[#45474c] text-[14px]">No active projects.</p>
+                <p className="text-foreground text-[14px]">
+                  No active projects.
+                </p>
               </div>
             )}
           </div>
@@ -422,7 +391,7 @@ export default function StakeholderDashboard() {
               <div className="w-10 h-10 rounded-full border-2 border-white bg-slate-500 flex items-center justify-center text-xs font-bold">
                 DS
               </div>
-              <div className="w-10 h-10 rounded-full bg-[#eff4ff] flex items-center justify-center border-2 border-white text-xs font-bold text-[#45474c]">
+              <div className="w-10 h-10 rounded-full bg-[#eff4ff] flex items-center justify-center border-2 border-white text-xs font-bold text-foreground">
                 +12
               </div>
             </div>
@@ -430,7 +399,7 @@ export default function StakeholderDashboard() {
               <p className="text-[14px] font-medium text-[#091426]">
                 Active Steering Committee
               </p>
-              <p className="text-[11px] text-[#45474c]">
+              <p className="text-[11px] text-foreground">
                 Scheduled Sync: Today, 3:00 PM
               </p>
             </div>
@@ -440,9 +409,11 @@ export default function StakeholderDashboard() {
             <button className="px-4 py-2 border border-[#c5c6cd] rounded-lg hover:bg-[#eff4ff] transition-all text-[14px] font-medium flex items-center gap-2">
               <Share2 className="w-4 h-4" /> Export Report
             </button>
-            <button className="px-4 py-2 bg-[#0058be] text-white rounded-lg hover:bg-[#0058be]/90 transition-all text-[14px] font-medium flex items-center gap-2">
-              <Plus className="w-4 h-4" /> Request Briefing
-            </button>
+            <Link href="/stakeholder/dashboard/brief">
+              <button className="px-4 py-2 bg-[#0058be] text-white rounded-lg hover:bg-[#0058be]/90 transition-all text-[14px] font-medium flex items-center gap-2">
+                <Plus className="w-4 h-4" /> Request Briefing
+              </button>
+            </Link>
           </div>
         </div>
       </main>

@@ -3,11 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Search,
-  Bell,
-  Settings,
   ChevronRight,
-  ChevronDown,
   Mail,
   Eye,
   EyeOff,
@@ -16,7 +12,29 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { usersApi } from "@/lib/api";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
+
+// Import Shadcn UI Components
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxContent,
+  ComboboxList,
+  ComboboxItem,
+} from "@/components/ui/combobox";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 type InviteMethod = "email" | "manual";
 
@@ -27,18 +45,21 @@ export default function AddUser() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
+  const segments = pathname.split("/").filter(Boolean);
 
   // Form Fields
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [tempPassword, setTempPassword] = useState("");
+  const [team, setTeam] = useState("");
 
-  // State untuk melacak checkbox yang dipilih agar styling dinamis Tailwind bekerja
+  // Workspaces selection state
   const [workspaces, setWorkspaces] = useState({
-    alpha: false,
-    beta: false,
-    enterprise: false,
+    Alpha: false,
+    Beta: false,
+    Enterprise: false,
   });
 
   const handleCheckboxChange = (key: keyof typeof workspaces) => {
@@ -50,12 +71,32 @@ export default function AddUser() {
     setIsSubmitting(true);
     setErrorMsg("");
 
+    const selectedWorkspaces = Object.entries(workspaces)
+      .filter(([_, checked]) => checked)
+      .map(([name]) => name);
+
+    // Business Logic Frontend Validation
+    if (role === "developer") {
+      if (!team) {
+        setErrorMsg("Developer wajib dimasukkan ke dalam team/department");
+        setIsSubmitting(false);
+        return;
+      }
+      if (selectedWorkspaces.length === 0) {
+        setErrorMsg("Developer wajib memilih minimal satu workspace");
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
     try {
       const payload = {
         email,
         displayName: fullName,
         role: role || "stakeholder",
         password: inviteMethod === "manual" ? tempPassword : undefined,
+        team: role === "developer" ? team : undefined,
+        workspaces: role === "developer" ? selectedWorkspaces : undefined,
       };
 
       await usersApi.create(payload);
@@ -69,7 +110,7 @@ export default function AddUser() {
     }
   };
 
-  // Varian animasi untuk transisi elemen form
+  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0, y: 15 },
     show: {
@@ -80,32 +121,59 @@ export default function AddUser() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#f8f9ff] text-[#0b1c30] font-sans">
+    <div className="flex-1 flex flex-col bg-background  font-sans">
       {/* Main Content Canvas */}
-      <main className="min-h-[calc(100vh-64px)] flex flex-col py-8 px-8">
+      <main className="min-h-[calc(100vh-64px)]  text-foreground flex justify-items-start flex-col py-8 px-8">
         {/* Breadcrumb & Header Cluster */}
-        <div className="max-w-[800px] w-full mx-auto mb-6">
-          <nav
-            aria-label="Breadcrumb"
-            className="flex items-center gap-1 text-[12px] font-semibold uppercase tracking-wider text-[#75777d] mb-2"
-          >
-            <a className="hover:text-[#0058be] transition-colors" href="#">
-              User Management
-            </a>
-            <ChevronRight className="w-3.5 h-3.5 text-[#75777d]" />
-            <span className="text-[#0b1c30] font-bold">Add User</span>
-          </nav>
-          <h1 className="text-[30px] font-bold text-[#091426] tracking-tight">
+        <div className="max-w-[800px] w-full mb-4">
+          <Breadcrumb className="mb-2">
+            <BreadcrumbList>
+              {segments.map((segment, index) => {
+                const isLast = index === segments.length - 1;
+                const mapping = {
+                  label:
+                    segment.charAt(0).toUpperCase() +
+                    segment.slice(1).replace(/-/g, " "),
+                  href: "/" + segments.slice(0, index + 1).join("/"),
+                };
+
+                return (
+                  <React.Fragment key={segment}>
+                    <BreadcrumbItem>
+                      {isLast ? (
+                        <BreadcrumbPage className="font-bold text-[#0b1c30]">
+                          {mapping.label}
+                        </BreadcrumbPage>
+                      ) : (
+                        <BreadcrumbLink asChild>
+                          <Link
+                            href={mapping.href}
+                            className="text-[#75777d] hover:text-[#0058be] transition-colors"
+                          >
+                            {mapping.label}
+                          </Link>
+                        </BreadcrumbLink>
+                      )}
+                    </BreadcrumbItem>
+                    {!isLast && (
+                      <BreadcrumbSeparator className="text-[#75777d]" />
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </BreadcrumbList>
+          </Breadcrumb>
+          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance">
             New Team Member
           </h1>
-          <p className="text-[16px] text-[#45474c] mt-1">
+          <p className="text-[16px] text-foreground mt-1">
             Provision a new user account and set workspace permissions.
           </p>
         </div>
 
         {/* Form Container */}
         <motion.div
-          className="max-w-[800px] w-full mx-auto bg-white border border-[#c5c6cd] rounded-xl overflow-hidden shadow-sm"
+          className=" w-full mx-auto bg-card border-border border-1 rounded-xl overflow-hidden shadow-sm"
           variants={containerVariants}
           initial="hidden"
           animate="show"
@@ -118,14 +186,8 @@ export default function AddUser() {
             {/* Section: Personal Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
-                <label
-                  className="text-[14px] font-medium text-[#0b1c30]"
-                  htmlFor="full_name"
-                >
-                  Full Name
-                </label>
-                <input
-                  className="border border-[#c5c6cd] rounded-lg p-3 text-[14px] focus:border-[#0058be] focus:ring-2 focus:ring-[#0058be]/20 transition-all outline-none bg-white"
+                <Label htmlFor="full_name">Full Name</Label>
+                <Input
                   id="full_name"
                   name="full_name"
                   placeholder="e.g. Alex Rivera"
@@ -136,14 +198,8 @@ export default function AddUser() {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label
-                  className="text-[14px] font-medium text-[#0b1c30]"
-                  htmlFor="email"
-                >
-                  Email Address
-                </label>
-                <input
-                  className="border border-[#c5c6cd] rounded-lg p-3 text-[14px] focus:border-[#0058be] focus:ring-2 focus:ring-[#0058be]/20 transition-all outline-none bg-white"
+                <Label htmlFor="email">Email Address</Label>
+                <Input
                   id="email"
                   name="email"
                   placeholder="alex@devprogress.io"
@@ -155,150 +211,155 @@ export default function AddUser() {
               </div>
             </div>
 
-            {/* Section: Role & Team */}
+            {/* Section: Role */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-[#e5eeff] pt-6">
               <div className="flex flex-col gap-2">
-                <label
-                  className="text-[14px] font-medium text-[#0b1c30]"
-                  htmlFor="role"
+                <Label htmlFor="role">Role</Label>
+                <Combobox
+                  value={role}
+                  onValueChange={(val) => {
+                    setRole(val || "");
+                    // Clear team and workspaces if not a developer
+                    if (val !== "developer") {
+                      setTeam("");
+                      setWorkspaces({
+                        Alpha: false,
+                        Beta: false,
+                        Enterprise: false,
+                      });
+                    }
+                  }}
                 >
-                  Role
-                </label>
-                <div className="relative">
-                  <select
-                    className="w-full border border-[#c5c6cd] rounded-lg p-3 text-[14px] focus:border-[#0058be] focus:ring-2 focus:ring-[#0058be]/20 appearance-none transition-all outline-none bg-white pr-10"
-                    id="role"
-                    name="role"
-                    required
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                  >
-                    <option value="" disabled>
-                      Select a role
-                    </option>
-                    <option value="admin">Admin</option>
-                    <option value="developer">Developer</option>
-                    <option value="stakeholder">Stakeholder</option>
-                  </select>
-                  <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#75777d]" />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label
-                  className="text-[14px] font-medium text-[#0b1c30]"
-                  htmlFor="department"
-                >
-                  Team/Department
-                </label>
-                <div className="relative">
-                  <select
-                    className="w-full border border-[#c5c6cd] rounded-lg p-3 text-[14px] focus:border-[#0058be] focus:ring-2 focus:ring-[#0058be]/20 appearance-none transition-all outline-none bg-white pr-10"
-                    id="department"
-                    name="department"
-                  >
-                    <option value="" disabled selected>
-                      Select a team
-                    </option>
-                    <option value="engineering">Engineering</option>
-                    <option value="product">Product</option>
-                    <option value="design">Design</option>
-                    <option value="qa">Quality Assurance</option>
-                  </select>
-                  <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#75777d]" />
-                </div>
+                  <ComboboxInput placeholder="Select a role" />
+                  <ComboboxContent className="bg-white border border-[#c5c6cd] rounded-md shadow-md max-h-60 overflow-y-auto">
+                    <ComboboxList>
+                      <ComboboxItem value="admin">Admin</ComboboxItem>
+                      <ComboboxItem value="developer">Developer</ComboboxItem>
+                      <ComboboxItem value="stakeholder">
+                        Stakeholder
+                      </ComboboxItem>
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
               </div>
             </div>
 
-            {/* Section: Workspace Access */}
-            <div className="space-y-2 border-t border-[#e5eeff] pt-6">
-              <span className="text-[14px] font-medium text-[#0b1c30]">
-                Workspace Access
-              </span>
-              <p className="text-[12px] text-[#75777d] font-semibold tracking-wide uppercase mb-4">
-                Select the environments this user can access.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Alpha */}
-                <label
-                  className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-colors group select-none ${
-                    workspaces.alpha
-                      ? "bg-[#dce9ff] border-[#0058be]"
-                      : "border-[#c5c6cd] hover:bg-[#eff4ff]"
-                  }`}
+            {/* Dynamic Section: Team & Workspaces (Developer Only) */}
+            <AnimatePresence>
+              {role === "developer" && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-6 border-t border-[#e5eeff] pt-6 overflow-hidden"
                 >
-                  <input
-                    className="w-5 h-5 rounded border-[#c5c6cd] text-[#0058be] focus:ring-[#0058be]"
-                    name="workspace"
-                    type="checkbox"
-                    checked={workspaces.alpha}
-                    onChange={() => handleCheckboxChange("alpha")}
-                    value="alpha"
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-[14px] font-medium text-[#0b1c30]">
-                      Alpha
-                    </span>
-                    <span className="text-[10px] text-[#75777d] uppercase tracking-wider font-semibold">
-                      Internal Dev
-                    </span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="team">Team / Department</Label>
+                      <Combobox
+                        value={team}
+                        onValueChange={(val) => setTeam(val || "")}
+                      >
+                        <ComboboxInput placeholder="Select a team" />
+                        <ComboboxContent className="bg-white border border-[#c5c6cd] rounded-md shadow-md max-h-60 overflow-y-auto">
+                          <ComboboxList>
+                            <ComboboxItem value="Engineering">
+                              Engineering
+                            </ComboboxItem>
+                            <ComboboxItem value="Product">Product</ComboboxItem>
+                            <ComboboxItem value="Design">Design</ComboboxItem>
+                            <ComboboxItem value="Quality Assurance">
+                              Quality Assurance
+                            </ComboboxItem>
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
+                    </div>
                   </div>
-                </label>
 
-                {/* Beta */}
-                <label
-                  className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-colors group select-none ${
-                    workspaces.beta
-                      ? "bg-[#dce9ff] border-[#0058be]"
-                      : "border-[#c5c6cd] hover:bg-[#eff4ff]"
-                  }`}
-                >
-                  <input
-                    className="w-5 h-5 rounded border-[#c5c6cd] text-[#0058be] focus:ring-[#0058be]"
-                    name="workspace"
-                    type="checkbox"
-                    checked={workspaces.beta}
-                    onChange={() => handleCheckboxChange("beta")}
-                    value="beta"
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-[14px] font-medium text-[#0b1c30]">
-                      Beta
-                    </span>
-                    <span className="text-[10px] text-[#75777d] uppercase tracking-wider font-semibold">
-                      Client Staging
-                    </span>
-                  </div>
-                </label>
+                  {/* Workspace Access */}
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-[14px]">Workspace Access</Label>
+                      <p className="text-[12px] text-[#75777d] mt-0.5">
+                        Select the environments this developer can access.
+                      </p>
+                    </div>
 
-                {/* Enterprise */}
-                <label
-                  className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-colors group select-none ${
-                    workspaces.enterprise
-                      ? "bg-[#dce9ff] border-[#0058be]"
-                      : "border-[#c5c6cd] hover:bg-[#eff4ff]"
-                  }`}
-                >
-                  <input
-                    className="w-5 h-5 rounded border-[#c5c6cd] text-[#0058be] focus:ring-[#0058be]"
-                    name="workspace"
-                    type="checkbox"
-                    checked={workspaces.enterprise}
-                    onChange={() => handleCheckboxChange("enterprise")}
-                    value="enterprise"
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-[14px] font-medium text-[#0b1c30]">
-                      Enterprise
-                    </span>
-                    <span className="text-[10px] text-[#75777d] uppercase tracking-wider font-semibold">
-                      Production
-                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      {/* Alpha */}
+                      <label
+                        className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-colors group select-none ${
+                          workspaces.Alpha
+                            ? "bg-[#dce9ff] border-[#0058be]"
+                            : "border-[#c5c6cd] hover:bg-[#eff4ff]"
+                        }`}
+                      >
+                        <Checkbox
+                          checked={workspaces.Alpha}
+                          onCheckedChange={() => handleCheckboxChange("Alpha")}
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-[14px] font-medium text-[#0b1c30]">
+                            Alpha
+                          </span>
+                          <span className="text-[10px] text-[#75777d] uppercase tracking-wider font-semibold">
+                            Internal Dev
+                          </span>
+                        </div>
+                      </label>
+
+                      {/* Beta */}
+                      <label
+                        className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-colors group select-none ${
+                          workspaces.Beta
+                            ? "bg-[#dce9ff] border-[#0058be]"
+                            : "border-[#c5c6cd] hover:bg-[#eff4ff]"
+                        }`}
+                      >
+                        <Checkbox
+                          checked={workspaces.Beta}
+                          onCheckedChange={() => handleCheckboxChange("Beta")}
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-[14px] font-medium text-[#0b1c30]">
+                            Beta
+                          </span>
+                          <span className="text-[10px] text-[#75777d] uppercase tracking-wider font-semibold">
+                            Client Staging
+                          </span>
+                        </div>
+                      </label>
+
+                      {/* Enterprise */}
+                      <label
+                        className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-colors group select-none ${
+                          workspaces.Enterprise
+                            ? "bg-[#dce9ff] border-[#0058be]"
+                            : "border-[#c5c6cd] hover:bg-[#eff4ff]"
+                        }`}
+                      >
+                        <Checkbox
+                          checked={workspaces.Enterprise}
+                          onCheckedChange={() =>
+                            handleCheckboxChange("Enterprise")
+                          }
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-[14px] font-medium text-[#0b1c30]">
+                            Enterprise
+                          </span>
+                          <span className="text-[10px] text-[#75777d] uppercase tracking-wider font-semibold">
+                            Production
+                          </span>
+                        </div>
+                      </label>
+                    </div>
                   </div>
-                </label>
-              </div>
-            </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Section: Invite Method */}
             <div className="border-t border-[#e5eeff] pt-6">
@@ -315,8 +376,8 @@ export default function AddUser() {
                   <button
                     className={`px-4 py-1 rounded-full text-[12px] font-semibold transition-all duration-200 ${
                       inviteMethod === "email"
-                        ? "bg-[#0058be] text-white shadow-sm"
-                        : "text-[#45474c] hover:text-[#091426]"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-foreground hover:text-[#091426]"
                     }`}
                     type="button"
                     onClick={() => setInviteMethod("email")}
@@ -326,8 +387,8 @@ export default function AddUser() {
                   <button
                     className={`px-4 py-1 rounded-full text-[12px] font-semibold transition-all duration-200 ${
                       inviteMethod === "manual"
-                        ? "bg-[#0058be] text-white shadow-sm"
-                        : "text-[#45474c] hover:text-[#091426]"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-foreground hover:text-[#091426]"
                     }`}
                     type="button"
                     onClick={() => setInviteMethod("manual")}
@@ -337,7 +398,7 @@ export default function AddUser() {
                 </div>
               </div>
 
-              {/* Animasi Transisi Konten Dinamis Berdasarkan Metode Undangan */}
+              {/* Invitation Content Panel */}
               <div className="min-h-[85px] relative">
                 <AnimatePresence mode="wait">
                   {inviteMethod === "email" ? (
@@ -355,10 +416,10 @@ export default function AddUser() {
                           Invitation Email
                         </span>
                       </div>
-                      <p className="text-[14px] text-[#45474c] leading-relaxed">
-                        An automated email will be sent to the user with a
-                        secure link to set up their account and password. This
-                        link expires in 24 hours.
+                      <p className="text-[14px] text-foreground leading-relaxed">
+                        An automated email will be sent to the user via Resend
+                        with a generated temporary password to set up their
+                        account.
                       </p>
                     </motion.div>
                   ) : (
@@ -371,15 +432,11 @@ export default function AddUser() {
                       className="space-y-2"
                     >
                       <div className="flex flex-col gap-2">
-                        <label
-                          className="text-[14px] font-medium text-[#0b1c30]"
-                          htmlFor="temp_password"
-                        >
+                        <Label htmlFor="temp_password">
                           Temporary Password
-                        </label>
+                        </Label>
                         <div className="relative max-w-md">
-                          <input
-                            className="w-full border border-[#c5c6cd] rounded-lg p-3 pr-10 text-[14px] focus:border-[#0058be] focus:ring-2 focus:ring-[#0058be]/20 transition-all outline-none bg-white"
+                          <Input
                             id="temp_password"
                             placeholder="••••••••"
                             type={showPassword ? "text" : "password"}
@@ -418,19 +475,20 @@ export default function AddUser() {
 
             {/* Form Actions Panel */}
             <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-4 border-t border-[#e5eeff] pt-6">
-              <button
-                className="w-full sm:w-auto px-5 py-2.5 text-[14px] font-medium text-[#45474c] hover:bg-[#eff4ff] transition-all rounded-lg"
+              <Button
+                variant="ghost"
+                className="w-full sm:w-auto px-5 py-2.5 text-[14px] font-medium text-foreground hover:bg-[#eff4ff] transition-all rounded-lg"
                 type="button"
                 onClick={() => router.push("/admin/user-management")}
               >
                 Cancel
-              </button>
+              </Button>
 
-              <button
+              <Button
                 className={`w-full sm:w-auto px-6 py-2.5 text-[14px] font-medium rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center gap-2 ${
                   isSuccess
-                    ? "bg-emerald-600 text-white shadow-emerald-600/10"
-                    : "bg-[#0058be] text-white shadow-[#0058be]/10 hover:shadow-md hover:scale-[1.01] active:scale-[0.99]"
+                    ? "bg-emerald-600 text-white shadow-emerald-600/10 hover:bg-emerald-700"
+                    : "bg-primary text-primary-foreground shadow-[#0058be]/10 hover:bg-sidebar-foreground hover:shadow-md hover:scale-[1.01] active:scale-[0.99]"
                 }`}
                 type="submit"
                 disabled={isSubmitting || isSuccess}
@@ -458,12 +516,12 @@ export default function AddUser() {
                     </motion.span>
                   )}
                 </AnimatePresence>
-              </button>
+              </Button>
             </div>
           </form>
         </motion.div>
 
-        {/* Footer / Policy Info Links */}
+        {/* Footer */}
         <footer className="max-w-[800px] w-full mx-auto mt-6 flex justify-between items-center text-[12px] font-medium text-[#75777d]">
           <span>© {new Date().getFullYear()} DevProgress Systems</span>
           <div className="flex gap-4">

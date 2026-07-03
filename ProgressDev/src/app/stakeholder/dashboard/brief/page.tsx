@@ -28,7 +28,7 @@ import { useEffect } from "react";
 export default function RequestBriefing() {
   const params = useParams();
   const router = useRouter();
-  
+
   // State manajemen form sederhana
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -44,8 +44,9 @@ export default function RequestBriefing() {
 
   useEffect(() => {
     if (params.project) {
-      projectsApi.getBySlug(params.project as string)
-        .then(res => setProjectId(res.id))
+      projectsApi
+        .getBySlug(params.project as string)
+        .then((res) => setProjectId(res.id))
         .catch(console.error);
     }
   }, [params.project]);
@@ -79,60 +80,12 @@ export default function RequestBriefing() {
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] text-[#0b1c30] font-sans antialiased selection:bg-[#0058be]/20">
-      {/* Top Navigation Bar */}
-      <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-[#c5c6cd] flex justify-between items-center px-8 z-40">
-        <div className="flex items-center gap-6">
-          <h1 className="text-[24px] font-bold text-[#091426] flex items-center gap-2 tracking-tight">
-            <Cpu className="w-6 h-6 text-[#0058be]" />
-            DevProgress
-          </h1>
-        </div>
-
-        <div className="flex items-center flex-1 max-w-xl mx-8 bg-[#eff4ff] rounded-full px-4 py-1.5 border border-transparent focus-within:border-[#0058be]/30 transition-all">
-          <Search className="w-4 h-4 text-[#75777d]" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-transparent border-none focus:ring-0 text-[14px] w-full ml-2 text-[#0b1c30] placeholder-[#75777d] outline-none"
-            placeholder="Search resources or projects..."
-          />
-        </div>
-
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <button className="p-2 text-[#45474c] hover:bg-[#e5eeff] transition-all rounded-full relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#ba1a1a] rounded-full border-2 border-white"></span>
-            </button>
-            <button className="p-2 text-[#45474c] hover:bg-[#e5eeff] transition-all rounded-full">
-              <HelpCircle className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="h-8 w-[1px] bg-[#c5c6cd]"></div>
-
-          <div className="flex items-center gap-3 cursor-pointer hover:bg-[#eff4ff] p-1.5 pr-4 rounded-full transition-all duration-150">
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-[#2170e4] flex items-center justify-center text-white font-bold text-xs border border-[#c5c6cd]">
-              JH
-            </div>
-            <div className="hidden lg:block">
-              <p className="text-[14px] font-medium text-[#0b1c30] leading-none">
-                James Harrington
-              </p>
-              <p className="text-[10px] text-[#45474c] mt-1 font-semibold tracking-wider uppercase">
-                Executive Stakeholder
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Main Content Canvas */}
-      <main className="pt-24 pb-12 px-8 min-h-screen w-full">
+      <main className=" p-8 min-h-screen w-full">
         <div className="max-w-7xl mx-auto grid grid-cols-12 gap-8">
           {/* Header Section */}
           <div className="col-span-12 mb-2">
-            <nav className="flex items-center gap-1 text-[#45474c] text-[12px] font-semibold uppercase tracking-wider mb-2">
+            <nav className="flex items-center gap-1 text-foreground text-[12px] font-semibold uppercase tracking-wider mb-2">
               <span className="hover:text-[#0058be] cursor-pointer">
                 Stakeholder View
               </span>
@@ -142,7 +95,7 @@ export default function RequestBriefing() {
             <h2 className="text-[30px] font-bold text-[#091426] tracking-tight">
               Request Briefing
             </h2>
-            <p className="text-[#45474c] text-[16px] mt-1">
+            <p className="text-foreground text-[16px] mt-1">
               Schedule a high-level review or a technical deep-dive for your
               active projects.
             </p>
@@ -174,15 +127,25 @@ export default function RequestBriefing() {
                       Briefing Type
                     </label>
                     <div className="relative">
-                      <select 
+                      <select
                         value={formData.type}
-                        onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, type: e.target.value })
+                        }
                         className="w-full bg-white border border-[#c5c6cd] rounded-lg p-3 pr-10 text-[14px] text-[#0b1c30] focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] appearance-none transition-all outline-none"
                       >
-                        <option value="Executive Summary">Executive Summary</option>
-                        <option value="Technical Deep-dive">Technical Deep-dive</option>
-                        <option value="Budget & Timeline Review">Budget & Timeline Review</option>
-                        <option value="Risk Assessment Briefing">Risk Assessment Briefing</option>
+                        <option value="Executive Summary">
+                          Executive Summary
+                        </option>
+                        <option value="Technical Deep-dive">
+                          Technical Deep-dive
+                        </option>
+                        <option value="Budget & Timeline Review">
+                          Budget & Timeline Review
+                        </option>
+                        <option value="Risk Assessment Briefing">
+                          Risk Assessment Briefing
+                        </option>
                       </select>
                       <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#75777d]" />
                     </div>
@@ -199,7 +162,12 @@ export default function RequestBriefing() {
                       <input
                         type="date"
                         value={formData.preferredDate}
-                        onChange={(e) => setFormData({ ...formData, preferredDate: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            preferredDate: e.target.value,
+                          })
+                        }
                         className="w-full bg-white border border-[#c5c6cd] rounded-lg p-3 text-[14px] text-[#0b1c30] focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition-all outline-none"
                       />
                       <Calendar className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#75777d]" />
@@ -214,7 +182,12 @@ export default function RequestBriefing() {
                       <input
                         type="time"
                         value={formData.preferredTime}
-                        onChange={(e) => setFormData({ ...formData, preferredTime: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            preferredTime: e.target.value,
+                          })
+                        }
                         className="w-full bg-white border border-[#c5c6cd] rounded-lg p-3 text-[14px] text-[#0b1c30] focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition-all outline-none"
                       />
                       <Clock className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#75777d]" />
@@ -270,7 +243,9 @@ export default function RequestBriefing() {
                   </label>
                   <textarea
                     value={formData.objectives}
-                    onChange={(e) => setFormData({ ...formData, objectives: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, objectives: e.target.value })
+                    }
                     className="w-full bg-white border border-[#c5c6cd] rounded-lg p-3 text-[14px] text-[#0b1c30] focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition-all resize-none outline-none"
                     placeholder="Please outline the key topics you would like to cover during this session..."
                     rows={6}
@@ -285,8 +260,10 @@ export default function RequestBriefing() {
                 <div className="flex items-center justify-end gap-4 pt-4 border-t border-[#c5c6cd]">
                   <button
                     type="button"
-                    onClick={() => router.push(`/stakeholder/${params.project}`)}
-                    className="px-5 py-2 rounded-lg text-[14px] font-medium text-[#45474c] hover:bg-[#e5eeff] transition-all"
+                    onClick={() =>
+                      router.push(`/stakeholder/${params.project}`)
+                    }
+                    className="px-5 py-2 rounded-lg text-[14px] font-medium text-foreground hover:bg-[#e5eeff] transition-all"
                   >
                     Cancel
                   </button>
@@ -349,7 +326,7 @@ export default function RequestBriefing() {
                   <h4 className="text-[14px] font-bold text-[#0b1c30]">
                     Cloud Migration Q2 Status
                   </h4>
-                  <p className="text-[#45474c] text-[12px] line-clamp-2 mt-1">
+                  <p className="text-foreground text-[12px] line-clamp-2 mt-1">
                     High-level recap of infrastructure deployment and remaining
                     roadmap...
                   </p>
@@ -372,7 +349,7 @@ export default function RequestBriefing() {
                   <h4 className="text-[14px] font-bold text-[#0b1c30]">
                     Budget Review: Phase 4
                   </h4>
-                  <p className="text-[#45474c] text-[12px] line-clamp-2 mt-1">
+                  <p className="text-foreground text-[12px] line-clamp-2 mt-1">
                     Detailed breakdown of expenditure vs. projection for API
                     overhaul.
                   </p>

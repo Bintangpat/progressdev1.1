@@ -202,8 +202,23 @@ export const usersApi = {
   /** Ambil semua user */
   getAll: () => apiRequest<ApiProfile[]>("GET", `/users`),
   /** Buat user baru */
-  create: (data: { email: string; displayName: string; role: string; password?: string }) =>
-    apiRequest<ApiProfile>("POST", "/users", data),
+  create: (data: {
+    email: string;
+    displayName: string;
+    role: string;
+    password?: string;
+    team?: string;
+    workspaces?: string[];
+  }) => apiRequest<ApiProfile>("POST", "/users", data),
+  /** Update user */
+  update: (id: string, data: {
+    email?: string;
+    displayName?: string;
+    role?: string;
+    password?: string;
+  }) => apiRequest<ApiProfile>("PATCH", `/users/${id}`, data),
+  /** Hapus user */
+  delete: (id: string) => apiRequest<void>("DELETE", `/users/${id}`),
   /** Ambil user berdasarkan role */
   getByRole: (role: string) => apiRequest<ApiProfile[]>("GET", `/users?role=${role}`),
 };
@@ -290,3 +305,20 @@ export function getProjectStatusColors(status: ProjectStatus): {
       };
   }
 }
+
+// ──────────────────────────────────────────────
+// Settings API Functions
+// ──────────────────────────────────────────────
+
+export interface UpdateProfilePayload {
+  displayName?: string;
+  email?: string;
+  whatsapp?: string;
+}
+
+export const settingsApi = {
+  getMe: () => apiRequest<ApiProfile>("GET", "/users/me"),
+  updateMe: (data: UpdateProfilePayload) => apiRequest<ApiProfile>("PATCH", "/users/me", data),
+  changePassword: (data: any) => apiRequest<{ message: string }>("PATCH", "/users/me/password", data),
+  deactivateMe: () => apiRequest<{ message: string }>("DELETE", "/users/me"),
+};

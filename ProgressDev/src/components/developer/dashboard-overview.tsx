@@ -35,7 +35,7 @@ export default function DashboardOverview() {
           <div className="flex items-center gap-6 flex-1">
             <div className="relative w-full max-w-md">
               <SearchIcon
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#45474c]"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground"
                 size={18}
               />
               <input
@@ -46,10 +46,10 @@ export default function DashboardOverview() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <button className="p-2 text-[#45474c] hover:bg-[#eff4ff] rounded-lg transition-all">
+            <button className="p-2 text-foreground hover:bg-[#eff4ff] rounded-lg transition-all">
               <Bell size={20} />
             </button>
-            <button className="p-2 text-[#45474c] hover:bg-[#eff4ff] rounded-lg transition-all">
+            <button className="p-2 text-foreground hover:bg-[#eff4ff] rounded-lg transition-all">
               <HelpCircle size={20} />
             </button>
             <div className="h-8 w-px bg-[#c5c6cd] mx-2"></div>
@@ -58,7 +58,7 @@ export default function DashboardOverview() {
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>JD</AvatarFallback>
               </Avatar>
-              <button className="text-sm font-medium text-[#45474c] hover:text-[#091426] transition-colors">
+              <button className="text-sm font-medium text-foreground hover:text-[#091426] transition-colors">
                 Sign Out
               </button>
             </div>
@@ -73,7 +73,7 @@ export default function DashboardOverview() {
               <h2 className="text-3xl font-bold text-[#091426] tracking-tight">
                 My Projects
               </h2>
-              <p className="text-base text-[#45474c] mt-1">
+              <p className="text-base text-foreground mt-1">
                 Overview of your current technical roadmap and team performance.
               </p>
             </div>
@@ -88,7 +88,7 @@ export default function DashboardOverview() {
             <Card className="bg-[#f8f9ff] border-[#c5c6cd] shadow-none">
               <CardContent className="p-6 flex items-start justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-[#45474c] uppercase tracking-wider">
+                  <p className="text-xs font-semibold text-foreground uppercase tracking-wider">
                     Active Projects
                   </p>
                   <h3 className="text-3xl font-bold mt-1 text-[#091426]">12</h3>
@@ -106,7 +106,7 @@ export default function DashboardOverview() {
             <Card className="bg-[#f8f9ff] border-[#c5c6cd] shadow-none">
               <CardContent className="p-6 flex items-start justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-[#45474c] uppercase tracking-wider">
+                  <p className="text-xs font-semibold text-foreground uppercase tracking-wider">
                     Open Issues
                   </p>
                   <h3 className="text-3xl font-bold mt-1 text-[#091426]">48</h3>
@@ -123,13 +123,13 @@ export default function DashboardOverview() {
             <Card className="bg-[#f8f9ff] border-[#c5c6cd] shadow-none">
               <CardContent className="p-6 flex items-start justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-[#45474c] uppercase tracking-wider">
+                  <p className="text-xs font-semibold text-foreground uppercase tracking-wider">
                     Recent Commits
                   </p>
                   <h3 className="text-3xl font-bold mt-1 text-[#091426]">
                     256
                   </h3>
-                  <p className="text-[#45474c] text-xs font-medium flex items-center gap-1 mt-2">
+                  <p className="text-foreground text-xs font-medium flex items-center gap-1 mt-2">
                     <HistoryIcon size={14} />
                     Last 7 days
                   </p>
@@ -143,7 +143,7 @@ export default function DashboardOverview() {
             <Card className="bg-[#f8f9ff] border-[#c5c6cd] shadow-none">
               <CardContent className="p-6 flex items-start justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-[#45474c] uppercase tracking-wider">
+                  <p className="text-xs font-semibold text-foreground uppercase tracking-wider">
                     Team Velocity
                   </p>
                   <h3 className="text-3xl font-bold mt-1 text-[#091426]">
@@ -169,28 +169,28 @@ export default function DashboardOverview() {
                     <span className="px-2 py-1 bg-[#d3e4fe] text-[#0058be] text-xs font-semibold rounded-lg">
                       In Progress
                     </span>
-                    <button className="text-[#45474c] hover:text-[#091426] transition-colors">
+                    <button className="text-foreground hover:text-[#091426] transition-colors">
                       <MoreVertical size={20} />
                     </button>
                   </div>
                   <h4 className="text-xl font-semibold text-[#091426] mb-2">
                     E-commerce Mobile App
                   </h4>
-                  <p className="text-sm text-[#45474c] mb-6 line-clamp-2">
+                  <p className="text-sm text-foreground mb-6 line-clamp-2">
                     Redesigning the core customer journey for high-conversion
                     shopping experiences on iOS and Android.
                   </p>
                   <div className="flex flex-wrap gap-2 mb-6">
-                    <span className="px-2 py-0.5 bg-[#eff4ff] text-[#45474c] font-mono text-[13px] border border-[#c5c6cd] rounded">
+                    <span className="px-2 py-0.5 bg-[#eff4ff] text-foreground font-mono text-[13px] border border-[#c5c6cd] rounded">
                       React Native
                     </span>
-                    <span className="px-2 py-0.5 bg-[#eff4ff] text-[#45474c] font-mono text-[13px] border border-[#c5c6cd] rounded">
+                    <span className="px-2 py-0.5 bg-[#eff4ff] text-foreground font-mono text-[13px] border border-[#c5c6cd] rounded">
                       Firebase
                     </span>
                   </div>
                   <div className="mt-auto space-y-4">
                     <div>
-                      <div className="flex justify-between text-xs font-medium text-[#45474c] mb-1">
+                      <div className="flex justify-between text-xs font-medium text-foreground mb-1">
                         <span>Development Progress</span>
                         <span>65%</span>
                       </div>
@@ -210,7 +210,7 @@ export default function DashboardOverview() {
                           +3
                         </div>
                       </div>
-                      <span className="text-xs font-medium text-[#45474c] italic">
+                      <span className="text-xs font-medium text-foreground italic">
                         Updated 2h ago
                       </span>
                     </div>
@@ -223,31 +223,31 @@ export default function DashboardOverview() {
               <Card className="bg-[#f8f9ff] border-[#c5c6cd] shadow-none hover:shadow-md transition-all flex flex-col h-full cursor-pointer">
                 <CardContent className="p-6 flex flex-col h-full">
                   <div className="flex justify-between items-start mb-4">
-                    <span className="px-2 py-1 bg-[#eff4ff] text-[#45474c] text-xs font-semibold rounded-lg">
+                    <span className="px-2 py-1 bg-[#eff4ff] text-foreground text-xs font-semibold rounded-lg">
                       On Hold
                     </span>
-                    <button className="text-[#45474c] hover:text-[#091426] transition-colors">
+                    <button className="text-foreground hover:text-[#091426] transition-colors">
                       <MoreVertical size={20} />
                     </button>
                   </div>
                   <h4 className="text-xl font-semibold text-[#091426] mb-2">
                     Internal Analytics Tool
                   </h4>
-                  <p className="text-sm text-[#45474c] mb-6 line-clamp-2">
+                  <p className="text-sm text-foreground mb-6 line-clamp-2">
                     Real-time data visualization dashboard for tracking server
                     performance and user engagement metrics.
                   </p>
                   <div className="flex flex-wrap gap-2 mb-6">
-                    <span className="px-2 py-0.5 bg-[#eff4ff] text-[#45474c] font-mono text-[13px] border border-[#c5c6cd] rounded">
+                    <span className="px-2 py-0.5 bg-[#eff4ff] text-foreground font-mono text-[13px] border border-[#c5c6cd] rounded">
                       Vue.js
                     </span>
-                    <span className="px-2 py-0.5 bg-[#eff4ff] text-[#45474c] font-mono text-[13px] border border-[#c5c6cd] rounded">
+                    <span className="px-2 py-0.5 bg-[#eff4ff] text-foreground font-mono text-[13px] border border-[#c5c6cd] rounded">
                       Python
                     </span>
                   </div>
                   <div className="mt-auto space-y-4">
                     <div>
-                      <div className="flex justify-between text-xs font-medium text-[#45474c] mb-1">
+                      <div className="flex justify-between text-xs font-medium text-foreground mb-1">
                         <span>Development Progress</span>
                         <span>30%</span>
                       </div>
@@ -261,7 +261,7 @@ export default function DashboardOverview() {
                           <AvatarImage src="https://github.com/shadcn.png" />
                         </Avatar>
                       </div>
-                      <span className="text-xs font-medium text-[#45474c] italic">
+                      <span className="text-xs font-medium text-foreground italic">
                         Updated yesterday
                       </span>
                     </div>
@@ -277,28 +277,28 @@ export default function DashboardOverview() {
                     <span className="px-2 py-1 bg-green-50 text-green-700 border border-green-100 text-xs font-semibold rounded-lg">
                       Completed
                     </span>
-                    <button className="text-[#45474c] hover:text-[#091426] transition-colors">
+                    <button className="text-foreground hover:text-[#091426] transition-colors">
                       <MoreVertical size={20} />
                     </button>
                   </div>
                   <h4 className="text-xl font-semibold text-[#091426] mb-2">
                     Payment API Integration
                   </h4>
-                  <p className="text-sm text-[#45474c] mb-6 line-clamp-2">
+                  <p className="text-sm text-foreground mb-6 line-clamp-2">
                     Legacy payment gateway migration to Stripe Connect for
                     multi-vendor marketplace support.
                   </p>
                   <div className="flex flex-wrap gap-2 mb-6">
-                    <span className="px-2 py-0.5 bg-[#eff4ff] text-[#45474c] font-mono text-[13px] border border-[#c5c6cd] rounded">
+                    <span className="px-2 py-0.5 bg-[#eff4ff] text-foreground font-mono text-[13px] border border-[#c5c6cd] rounded">
                       Node.js
                     </span>
-                    <span className="px-2 py-0.5 bg-[#eff4ff] text-[#45474c] font-mono text-[13px] border border-[#c5c6cd] rounded">
+                    <span className="px-2 py-0.5 bg-[#eff4ff] text-foreground font-mono text-[13px] border border-[#c5c6cd] rounded">
                       PostgreSQL
                     </span>
                   </div>
                   <div className="mt-auto space-y-4">
                     <div>
-                      <div className="flex justify-between text-xs font-medium text-[#45474c] mb-1">
+                      <div className="flex justify-between text-xs font-medium text-foreground mb-1">
                         <span>Development Progress</span>
                         <span>100%</span>
                       </div>
@@ -315,7 +315,7 @@ export default function DashboardOverview() {
                           <AvatarFallback>TK</AvatarFallback>
                         </Avatar>
                       </div>
-                      <span className="text-xs font-medium text-[#45474c] italic">
+                      <span className="text-xs font-medium text-foreground italic">
                         Updated 3 days ago
                       </span>
                     </div>

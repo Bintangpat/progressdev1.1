@@ -41,9 +41,7 @@ export default function CreateProject() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   React.useEffect(() => {
-    usersApi.getByRole("developer")
-      .then(setDevelopers)
-      .catch(console.error);
+    usersApi.getByRole("developer").then(setDevelopers).catch(console.error);
   }, []);
 
   const removeMember = (id: string) => {
@@ -53,8 +51,8 @@ export default function CreateProject() {
   const addMember = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = e.target.value;
     if (!id) return;
-    const dev = developers.find(d => d.id === id);
-    if (dev && !teamMembers.find(m => m.id === id) && id !== selectedLeadId) {
+    const dev = developers.find((d) => d.id === id);
+    if (dev && !teamMembers.find((m) => m.id === id) && id !== selectedLeadId) {
       setTeamMembers([...teamMembers, dev]);
     }
   };
@@ -64,7 +62,7 @@ export default function CreateProject() {
       alert("Please fill in project name, deadline, and select a Project Lead");
       return;
     }
-    
+
     setIsSubmitting(true);
     try {
       await projectsApi.create({
@@ -76,7 +74,7 @@ export default function CreateProject() {
         budget: Number(formData.budget) || 0,
         teamMembers: [
           { profileId: selectedLeadId, role: "Project Lead" },
-          ...teamMembers.map(m => ({ profileId: m.id, role: "Developer" }))
+          ...teamMembers.map((m) => ({ profileId: m.id, role: "Developer" })),
         ],
       });
       router.push("/stakeholder/dashboard");
@@ -107,61 +105,6 @@ export default function CreateProject() {
 
   return (
     <div className="bg-[#f8f9ff] text-[#0b1c30] min-h-screen font-sans overflow-x-hidden selection:bg-[#0058be]/20">
-      {/* TopNavBar */}
-      <header className="w-full top-0 sticky z-50 bg-white border-b border-[#c5c6cd] flex justify-between items-center h-16 px-6 backdrop-blur-md bg-opacity-95">
-        <div className="flex items-center gap-6">
-          <span className="text-[24px] font-bold text-[#091426] tracking-tight">
-            DevProgress
-          </span>
-          <nav className="hidden md:flex gap-4 ml-8 text-[14px]">
-            <a
-              className="text-[#45474c] hover:bg-[#eff4ff] px-3 py-1.5 rounded transition-colors"
-              href="#"
-            >
-              Dashboard
-            </a>
-            <a
-              className="text-[#0058be] font-bold border-b-2 border-[#0058be] pb-1 px-1"
-              href="#"
-            >
-              Projects
-            </a>
-            <a
-              className="text-[#45474c] hover:bg-[#eff4ff] px-3 py-1.5 rounded transition-colors"
-              href="#"
-            >
-              Tasks
-            </a>
-            <a
-              className="text-[#45474c] hover:bg-[#eff4ff] px-3 py-1.5 rounded transition-colors"
-              href="#"
-            >
-              Settings
-            </a>
-          </nav>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="relative hidden sm:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#75777d] w-4 h-4" />
-            <input
-              className="pl-10 pr-4 py-2 bg-[#eff4ff] border-none rounded-lg text-[14px] w-64 focus:ring-2 focus:ring-[#0058be]/20 outline-none placeholder-[#75777d]"
-              placeholder="Search resources..."
-              type="text"
-            />
-          </div>
-          <button className="p-2 text-[#45474c] hover:bg-[#eff4ff] rounded-full transition-colors">
-            <Bell className="w-5 h-5" />
-          </button>
-          <button className="p-2 text-[#45474c] hover:bg-[#eff4ff] rounded-full transition-colors">
-            <Settings className="w-5 h-5" />
-          </button>
-          <div className="w-8 h-8 rounded-full bg-[#d8e2ff] flex items-center justify-center text-[#0058be] font-bold text-xs overflow-hidden border border-[#c5c6cd]">
-            U
-          </div>
-        </div>
-      </header>
-
       <div className="flex flex-col w-full">
         {/* Main Content Area */}
         <main className="flex-1 w-full min-w-0 p-6 md:p-12 relative overflow-hidden">
@@ -170,7 +113,7 @@ export default function CreateProject() {
 
           <div className="max-w-6xl mx-auto">
             <header className="mb-8">
-              <div className="flex items-center gap-1 text-[#45474c] mb-2 text-[14px]">
+              <div className="flex items-center gap-1 text-foreground mb-2 text-[14px]">
                 <a className="hover:text-[#0058be] transition-colors" href="#">
                   Projects
                 </a>
@@ -180,7 +123,7 @@ export default function CreateProject() {
               <h1 className="text-[30px] font-bold text-[#091426] tracking-tight">
                 Create New Project
               </h1>
-              <p className="text-[#45474c] text-[16px] mt-1">
+              <p className="text-foreground text-[16px] mt-1">
                 Initialize a new technical execution workspace with team and
                 deadlines.
               </p>
@@ -217,7 +160,12 @@ export default function CreateProject() {
                         placeholder="e.g., Cloud Infrastructure Audit 2024"
                         type="text"
                         value={formData.platformName}
-                        onChange={(e) => setFormData({ ...formData, platformName: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            platformName: e.target.value,
+                          })
+                        }
                       />
                     </div>
                     <div>
@@ -233,7 +181,12 @@ export default function CreateProject() {
                         placeholder="Provide technical scope and objectives..."
                         rows={6}
                         value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            description: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -253,14 +206,18 @@ export default function CreateProject() {
                         Project Lead
                       </label>
                       <div className="relative">
-                        <select 
+                        <select
                           className="w-full appearance-none px-4 py-3 rounded-lg border border-[#c5c6cd] focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10 transition-all outline-none bg-[#f8f9ff] pr-10 text-[14px]"
                           value={selectedLeadId}
                           onChange={(e) => setSelectedLeadId(e.target.value)}
                         >
-                          <option value="" disabled>Select Lead</option>
-                          {developers.map(dev => (
-                            <option key={dev.id} value={dev.id}>{dev.displayName || dev.email}</option>
+                          <option value="" disabled>
+                            Select Lead
+                          </option>
+                          {developers.map((dev) => (
+                            <option key={dev.id} value={dev.id}>
+                              {dev.displayName || dev.email}
+                            </option>
                           ))}
                         </select>
                         <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#75777d]" />
@@ -294,17 +251,25 @@ export default function CreateProject() {
                             </m.span>
                           ))}
                         </AnimatePresence>
-                        <select 
-                          className="bg-transparent text-[#45474c] text-[14px] px-1 outline-none appearance-none cursor-pointer"
+                        <select
+                          className="bg-transparent text-foreground text-[14px] px-1 outline-none appearance-none cursor-pointer"
                           onChange={addMember}
                           value=""
                         >
-                          <option value="" disabled>Add member...</option>
+                          <option value="" disabled>
+                            Add member...
+                          </option>
                           {developers
-                            .filter(d => d.id !== selectedLeadId && !teamMembers.find(m => m.id === d.id))
-                            .map(d => (
-                            <option key={d.id} value={d.id}>{d.displayName || d.email}</option>
-                          ))}
+                            .filter(
+                              (d) =>
+                                d.id !== selectedLeadId &&
+                                !teamMembers.find((m) => m.id === d.id),
+                            )
+                            .map((d) => (
+                              <option key={d.id} value={d.id}>
+                                {d.displayName || d.email}
+                              </option>
+                            ))}
                         </select>
                       </div>
                     </div>
@@ -332,7 +297,12 @@ export default function CreateProject() {
                           className="w-full px-4 py-3 rounded-lg border border-[#c5c6cd] focus:border-[#0058be] focus:ring-4 focus:ring-[#0058be]/10 transition-all outline-none bg-[#f8f9ff] text-[14px]"
                           type="date"
                           value={formData.durationEnd}
-                          onChange={(e) => setFormData({ ...formData, durationEnd: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              durationEnd: e.target.value,
+                            })
+                          }
                         />
                         <Calendar className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#75777d]" />
                       </div>
@@ -349,7 +319,7 @@ export default function CreateProject() {
                         >
                           <span className="w-3 h-3 rounded-full bg-[#0058be]"></span>
                           <span
-                            className={`text-[12px] ${priority === "low" ? "text-[#0058be] font-bold" : "text-[#45474c]"}`}
+                            className={`text-[12px] ${priority === "low" ? "text-[#0058be] font-bold" : "text-foreground"}`}
                           >
                             Low
                           </span>
@@ -361,7 +331,7 @@ export default function CreateProject() {
                         >
                           <span className="w-3 h-3 rounded-full bg-[#0d0093]"></span>
                           <span
-                            className={`text-[12px] ${priority === "med" ? "text-[#0058be] font-bold" : "text-[#45474c]"}`}
+                            className={`text-[12px] ${priority === "med" ? "text-[#0058be] font-bold" : "text-foreground"}`}
                           >
                             Med
                           </span>
@@ -373,7 +343,7 @@ export default function CreateProject() {
                         >
                           <span className="w-3 h-3 rounded-full bg-[#ba1a1a]"></span>
                           <span
-                            className={`text-[12px] ${priority === "high" ? "text-[#0058be] font-bold" : "text-[#45474c]"}`}
+                            className={`text-[12px] ${priority === "high" ? "text-[#0058be] font-bold" : "text-foreground"}`}
                           >
                             High
                           </span>
@@ -389,7 +359,9 @@ export default function CreateProject() {
                         type="number"
                         placeholder="e.g. 50000"
                         value={formData.budget}
-                        onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, budget: e.target.value })
+                        }
                       />
                     </div>
                   </div>
@@ -403,7 +375,7 @@ export default function CreateProject() {
                   <h2 className="text-[20px] font-bold text-[#091426] mb-1">
                     Template
                   </h2>
-                  <p className="text-[#45474c] text-[12px] mb-4">
+                  <p className="text-foreground text-[12px] mb-4">
                     Select a workflow structure to pre-fill tasks.
                   </p>
                   <div className="space-y-2">
@@ -443,15 +415,17 @@ export default function CreateProject() {
                   variants={itemVariants}
                   className="pt-2 flex flex-col gap-2"
                 >
-                  <button 
+                  <button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
                     className="w-full py-3 bg-[#0058be] text-white rounded-lg text-[14px] font-bold shadow-lg shadow-[#0058be]/20 hover:bg-[#0058be]/90 active:scale-[0.98] transition-all disabled:opacity-50 flex justify-center items-center gap-2"
                   >
-                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {isSubmitting && (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    )}
                     Create Project
                   </button>
-                  <button 
+                  <button
                     onClick={() => router.push("/stakeholder/dashboard")}
                     className="w-full py-3 bg-[#d3e4fe] text-[#0058be] rounded-lg text-[14px] font-medium hover:bg-[#dce9ff] transition-all"
                   >
@@ -477,7 +451,7 @@ export default function CreateProject() {
                     <h4 className="text-[14px] font-bold text-[#091426]">
                       Secure Execution
                     </h4>
-                    <p className="text-[12px] text-[#45474c]">
+                    <p className="text-[12px] text-foreground">
                       Encrypted project logs and access control.
                     </p>
                   </div>
@@ -496,7 +470,7 @@ export default function CreateProject() {
                     <h4 className="text-[14px] font-bold text-[#091426]">
                       Team Integration
                     </h4>
-                    <p className="text-[12px] text-[#45474c]">
+                    <p className="text-[12px] text-foreground">
                       Direct sync with GitHub and Jira tickets.
                     </p>
                   </div>

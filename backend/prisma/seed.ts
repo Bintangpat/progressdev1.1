@@ -128,6 +128,16 @@ async function main() {
   await prisma.task.deleteMany();
   await prisma.project.deleteMany();
   await prisma.profile.deleteMany();
+  await prisma.workspace.deleteMany();
+
+  // 1b. Create default workspaces
+  console.log('🌐 Creating default workspaces...');
+  const workspaces = ['Alpha', 'Beta', 'Enterprise'];
+  for (const ws of workspaces) {
+    await prisma.workspace.create({
+      data: { name: ws }
+    });
+  }
 
   // 2. Create developer user
   console.log('👤 Creating developer user...');

@@ -39,6 +39,7 @@ model Profile {
   createdAt    DateTime  @default(now()) @map("created_at")
   projects        Project[]
   teamMemberships ProjectTeamMember[]
+  workspaces      Workspace[] @relation("ProfileWorkspaces")
 
   @@map("profiles")
 }
@@ -121,11 +122,12 @@ model Comment {
 
 model ProjectTeamMember {
   id        String   @id @default(uuid()) @db.Uuid
-  projectId String   @map("project_id") @db.Uuid
+  projectId String?  @map("project_id") @db.Uuid
   profileId String   @map("profile_id") @db.Uuid
   role      String   // e.g., "Project Lead", "Member"
+  nama      String?  
   
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
   profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@map("project_team_members")
@@ -144,4 +146,13 @@ model ProjectBrief {
   project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@map("project_briefs")
+}
+
+model Workspace {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @unique // e.g. "Alpha", "Beta", "Enterprise"
+  createdAt DateTime  @default(now()) @map("created_at")
+  profiles  Profile[] @relation("ProfileWorkspaces")
+
+  @@map("workspaces")
 }

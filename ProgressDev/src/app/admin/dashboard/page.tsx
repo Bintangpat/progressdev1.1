@@ -34,8 +34,9 @@ export default function GlobalOverview() {
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
-    projectsApi.getAll()
-      .then(data => {
+    projectsApi
+      .getAll()
+      .then((data) => {
         setProjects(data);
         setIsLoading(false);
       })
@@ -43,9 +44,11 @@ export default function GlobalOverview() {
   }, []);
 
   const totalProjects = projects.length;
-  const completedProjects = projects.filter(p => p.status === "completed").length;
-  const onTrackProjects = projects.filter(p => p.status === "active").length;
-  const delayedProjects = projects.filter(p => {
+  const completedProjects = projects.filter(
+    (p) => p.status === "completed",
+  ).length;
+  const onTrackProjects = projects.filter((p) => p.status === "active").length;
+  const delayedProjects = projects.filter((p) => {
     const end = new Date(p.durationEnd).getTime();
     const now = new Date().getTime();
     return p.status === "active" && end < now;
@@ -55,7 +58,6 @@ export default function GlobalOverview() {
     <div className="flex min-h-screen bg-[#f8f9ff] text-[#0b1c30] font-sans">
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col">
-
         {/* Content Canvas */}
         <div className="p-8">
           {/* Welcome Section */}
@@ -67,7 +69,7 @@ export default function GlobalOverview() {
             <h1 className="text-3xl font-bold text-[#091426]">
               Global Project Overview
             </h1>
-            <p className="text-[#45474c] mt-1 text-sm">
+            <p className="text-foreground mt-1 text-sm">
               Real-time execution metrics across all active initiatives.
             </p>
           </motion.div>
@@ -133,75 +135,95 @@ export default function GlobalOverview() {
                 <tbody className="divide-y divide-[#c5c6cd]">
                   {isLoading ? (
                     <tr>
-                      <td colSpan={6} className="text-center py-8 text-[#75777d]">Loading projects...</td>
-                    </tr>
-                  ) : projects.map((proj) => {
-                    const health = proj.status === "completed" ? "Completed" : proj.status === "draft" ? "Draft" : new Date(proj.durationEnd).getTime() < new Date().getTime() ? "Delayed" : "On Track";
-                    const membersCount = proj.teamMembers?.length || 0;
-                    return (
-                    <tr
-                      key={proj.id}
-                      className="hover:bg-[#f8f9ff] transition-colors group"
-                    >
-                      <td className="px-6 py-5">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold text-[#091426]">
-                            {proj.platformName}
-                          </span>
-                          <span className="text-[12px] text-[#45474c]">
-                            Budget: ${proj.budget}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5">
-                        <HealthBadge status={health} />
-                      </td>
-                      <td className="px-6 py-5">
-                        <div className="flex -space-x-2">
-                          {[...Array(Math.min(membersCount, 3))].map((_, i) => (
-                            <div
-                              key={i}
-                              className="w-8 h-8 rounded-full border-2 border-white bg-gray-200 relative overflow-hidden flex items-center justify-center text-[10px] font-bold"
-                            >
-                              {proj.teamMembers?.[i]?.profile?.displayName?.substring(0, 2).toUpperCase() || "MB"}
-                            </div>
-                          ))}
-                          {membersCount > 3 && (
-                            <div className="w-8 h-8 rounded-full border-2 border-white bg-[#e5eeff] flex items-center justify-center text-[10px] font-bold text-[#45474c]">
-                              +{membersCount - 3}
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-5 w-48">
-                        <div className="flex flex-col gap-1.5">
-                          <span className="text-[11px] font-bold text-[#45474c]">
-                            {proj.progress || 0}%
-                          </span>
-                          <div className="w-full h-1.5 bg-[#e5eeff] rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${health === "Delayed" ? "bg-[#ba1a1a]" : "bg-[#0058be]"}`}
-                              style={{ width: `${proj.progress || 0}%` }}
-                            />
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5 text-sm text-[#45474c]">
-                        {new Date(proj.durationEnd).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-5 text-right">
-                        <button className="p-1.5 hover:bg-[#e5eeff] rounded-lg transition-all text-[#45474c]">
-                          <Ellipsis size={18} />
-                        </button>
+                      <td
+                        colSpan={6}
+                        className="text-center py-8 text-[#75777d]"
+                      >
+                        Loading projects...
                       </td>
                     </tr>
-                  )})}
+                  ) : (
+                    projects.map((proj) => {
+                      const health =
+                        proj.status === "completed"
+                          ? "Completed"
+                          : proj.status === "draft"
+                            ? "Draft"
+                            : new Date(proj.durationEnd).getTime() <
+                                new Date().getTime()
+                              ? "Delayed"
+                              : "On Track";
+                      const membersCount = proj.teamMembers?.length || 0;
+                      return (
+                        <tr
+                          key={proj.id}
+                          className="hover:bg-[#f8f9ff] transition-colors group"
+                        >
+                          <td className="px-6 py-5">
+                            <div className="flex flex-col">
+                              <span className="text-sm font-bold text-[#091426]">
+                                {proj.platformName}
+                              </span>
+                              <span className="text-[12px] text-foreground">
+                                Budget: ${proj.budget}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-5">
+                            <HealthBadge status={health} />
+                          </td>
+                          <td className="px-6 py-5">
+                            <div className="flex -space-x-2">
+                              {[...Array(Math.min(membersCount, 3))].map(
+                                (_, i) => (
+                                  <div
+                                    key={i}
+                                    className="w-8 h-8 rounded-full border-2 border-white bg-gray-200 relative overflow-hidden flex items-center justify-center text-[10px] font-bold"
+                                  >
+                                    {proj.teamMembers?.[i]?.profile?.displayName
+                                      ?.substring(0, 2)
+                                      .toUpperCase() || "MB"}
+                                  </div>
+                                ),
+                              )}
+                              {membersCount > 3 && (
+                                <div className="w-8 h-8 rounded-full border-2 border-white bg-[#e5eeff] flex items-center justify-center text-[10px] font-bold text-foreground">
+                                  +{membersCount - 3}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-5 w-48">
+                            <div className="flex flex-col gap-1.5">
+                              <span className="text-[11px] font-bold text-foreground">
+                                {proj.progress || 0}%
+                              </span>
+                              <div className="w-full h-1.5 bg-[#e5eeff] rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full ${health === "Delayed" ? "bg-[#ba1a1a]" : "bg-[#0058be]"}`}
+                                  style={{ width: `${proj.progress || 0}%` }}
+                                />
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-5 text-sm text-foreground">
+                            {new Date(proj.durationEnd).toLocaleDateString()}
+                          </td>
+                          <td className="px-6 py-5 text-right">
+                            <button className="p-1.5 hover:bg-[#e5eeff] rounded-lg transition-all text-foreground">
+                              <Ellipsis size={18} />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
 
             <div className="px-6 py-4 border-t border-[#c5c6cd] flex justify-between items-center bg-[#f8f9ff]">
-              <span className="text-xs font-medium text-[#45474c]">
+              <span className="text-xs font-medium text-foreground">
                 Showing {projects.length} projects
               </span>
               <div className="flex items-center gap-2">
@@ -215,10 +237,10 @@ export default function GlobalOverview() {
                   <button className="w-8 h-8 flex items-center justify-center bg-[#0058be] text-white rounded-lg text-xs font-bold">
                     1
                   </button>
-                  <button className="w-8 h-8 flex items-center justify-center hover:bg-[#e5eeff] rounded-lg text-xs font-bold text-[#45474c]">
+                  <button className="w-8 h-8 flex items-center justify-center hover:bg-[#e5eeff] rounded-lg text-xs font-bold text-foreground">
                     2
                   </button>
-                  <button className="w-8 h-8 flex items-center justify-center hover:bg-[#e5eeff] rounded-lg text-xs font-bold text-[#45474c]">
+                  <button className="w-8 h-8 flex items-center justify-center hover:bg-[#e5eeff] rounded-lg text-xs font-bold text-foreground">
                     3
                   </button>
                 </div>
@@ -235,8 +257,6 @@ export default function GlobalOverview() {
 }
 
 // --- Sub-components ---
-
-
 
 const MetricCard = ({
   label,
@@ -287,7 +307,7 @@ const Th = ({
 );
 
 const TableActionBtn = ({ icon, label }: { icon: any; label: string }) => (
-  <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#c5c6cd] rounded-lg text-[#45474c] text-[11px] font-bold hover:bg-white transition-all">
+  <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#c5c6cd] rounded-lg text-foreground text-[11px] font-bold hover:bg-white transition-all">
     {icon} {label}
   </button>
 );
@@ -295,14 +315,14 @@ const TableActionBtn = ({ icon, label }: { icon: any; label: string }) => (
 const HealthBadge = ({ status }: { status: string }) => {
   const styles: any = {
     "On Track": "bg-green-50 text-green-700",
-    "Completed": "bg-blue-50 text-blue-700",
-    "Draft": "bg-gray-50 text-gray-700",
+    Completed: "bg-blue-50 text-blue-700",
+    Draft: "bg-gray-50 text-gray-700",
     Delayed: "bg-[#ffdad6] text-[#93000a]",
   };
   const dots: any = {
     "On Track": "bg-green-600",
-    "Completed": "bg-blue-600",
-    "Draft": "bg-gray-600",
+    Completed: "bg-blue-600",
+    Draft: "bg-gray-600",
     Delayed: "bg-[#ba1a1a]",
   };
 
